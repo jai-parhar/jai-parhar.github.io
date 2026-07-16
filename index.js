@@ -114,6 +114,8 @@ function fixBoundaryConds() {
 }
 
 function drawWaveEquation() {
+    // You don't need to clear screen here cuz it overwrites every box
+
     boxW = Math.ceil(windowW/Nx);
     boxH = Math.ceil(windowH/Ny);
 
@@ -164,18 +166,6 @@ function dropRandom() {
     }
 }
 
-/*
-var dropper;
-function startDropper() {
-    dropper = window.setInterval(dropRandom, 2000);
-}
-function stopDropper() {
-    window.clearInterval(dropper);
-}
-
-window.addEventListener('focus', startDropper);    
-window.addEventListener('blur', stopDropper);
-*/
 
 // Click to add a little gaussian packet
 canvas.addEventListener('click', function(event) {
@@ -247,7 +237,7 @@ function clamp(x, min, max) {
 
 // WELCOME TO SUPER SECRET!!!!!!!!!!!!!
 const SUPER_SECRET_PASSWORD = "RECLUSE".split("");
-var password_input = [];
+let password_input = [];
 
 // Ohhhh theyre typing in the super secret password omg 
 document.addEventListener("keydown", (event) => {
@@ -274,9 +264,9 @@ document.addEventListener("keydown", (event) => {
 
 
 // okay yeah actually gotta do the animation stuff now wonderful
-var stop = false;
-var frameCount = 0;
-var fps, fpsInterval, startTime, now, then, elapsed;
+let stop = false;
+let frameCount = 0;
+let fps, fpsInterval, startTime, now, then, elapsed;
 
 // initialize the timer variables and start the animation
 function startAnimating(fps) {
