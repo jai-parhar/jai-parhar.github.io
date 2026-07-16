@@ -255,7 +255,8 @@ document.addEventListener("keydown", (event) => {
     // I love you darling but sometimes you can chill out a bit with the comments
     password_input.push(event.key.toUpperCase());
 
-    console.log(password_input)
+    // For testing purposes only!
+    // console.log(password_input)
 
     // Tooooooo manyyyyy lettterrrrsssss
     if (password_input.length > SUPER_SECRET_PASSWORD.length) {
@@ -264,7 +265,7 @@ document.addEventListener("keydown", (event) => {
 
     // OHHH THEY IN
     if (password_input.join("") == SUPER_SECRET_PASSWORD.join("")) {
-        window.location.href = "backroom/index.html"; // OH SEND EM AWAY!
+        window.location.href = "backroom/"; // OH SEND EM AWAY!
     }
 });
 
