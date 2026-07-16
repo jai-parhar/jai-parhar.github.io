@@ -255,7 +255,7 @@ document.addEventListener("keydown", (event) => {
 
     // OHHH THEY IN
     if (password_input.join("") == SUPER_SECRET_PASSWORD.join("")) {
-        window.location.href = "backroom/"; // OH SEND EM AWAY!
+        window.location.href = "backroom/WELCOME/"; // OH SEND EM AWAY!
     }
 });
 
