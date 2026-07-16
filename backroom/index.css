@@ -49,6 +49,12 @@ body {
     /*width: 100%; /* Optional: adjust as needed */
 }
 
+#header:hover,
+#header::selection {
+  background-color: #ffffff; /* Sets the background color of the selection */
+  color: #000000; /* Sets the text color within the selection */
+}
+
 ::selection {
   background-color: #ffffff; /* Sets the background color of the selection */
   color: #000000; /* Sets the text color within the selection */

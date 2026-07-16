@@ -80,7 +80,7 @@ function draw() {
         context.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    context.fillStyle = "rgb(225, 225, 225)";
+    context.fillStyle = "rgb(255, 255, 255)";
     for (let i = 0; i < stars.length; i++) {
         stars[i].draw();
     }
