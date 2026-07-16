@@ -192,7 +192,6 @@ canvas.addEventListener('click', function(event) {
             u[x][y] += amplitude * Math.exp(-((x - gridX)**2 + (y - gridY)**2) / (2 * sigma**2));
         }
     }
-    console.log(mouseX);
 });
 
 
