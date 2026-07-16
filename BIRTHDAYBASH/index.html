@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+    <!-- Homepage --> 
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>BIRTHDAY HEAVEN!!!</title>
+    <link rel="stylesheet" href="index.css">
+	<link rel="icon" type="image/png" href="favicon.png">
+	
+</head>
+<body>
+    <div id="background" class="fireworks"></div>
+    
+    <!-- jsDelivr  -->
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
+
+    <script>
+        const container = document.querySelector('.fireworks');
+        const fireworks = new Fireworks.default(container, {
+            intensity:1000,
+            rocketsPoint: {
+                min: 100,
+                max: 0
+            }
+        });
+        fireworks.start();
+    </script>
+
+    <div id="foreground">
+        <div id="header">HAPPY BIRTHDAY CADENCE</div>
+        <img src="jumping cat gif.gif"></img>
+    </div>
+
+    <script src="textshimmer.js"></script>
+</body>
+</html>
+

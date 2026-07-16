@@ -8,9 +8,9 @@
 
 body {
     font-family: 'VCR OSD Mono';
-    /* margin-top: 2.5vw; */
-    /* margin-left: 8vw; */
-    /* margin-right: 8vw; */
+    margin-top: 2.5vw;
+    margin-left: 8vw;
+    margin-right: 8vw;
     background-color: rgb(0, 0, 0);
     color: white;
     z-index: 1;
@@ -28,22 +28,30 @@ body {
     min-height: 100vh;
 
     display: flex;
-    justify-content: center; /* horizontal */
-    align-items: center;     /* vertical */
+    justify-content: center;
 
     flex-direction: column;
 
-    gap: 5vh;
 }
 
 #header {
+    width: 100%;
     font-size: xx-large;
     text-align: center;
 }
 
-
 #content {
-    margin-bottom:6vw;
+    
+    margin-top: 5vh;
+    flex: 1;
+
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+    align-items: flex-start;
+
+    text-align: center;
+    
 }
 
 #footnote {
@@ -54,14 +62,15 @@ body {
     /*width: 100%; /* Optional: adjust as needed */
 }
 
-#header.clicked,
-#header.hovering,
-#header::selection {
-  background-color: #ffffff; /* Sets the background color of the selection */
-  color: #000000; /* Sets the text color within the selection */
+.content-link {
+    background-color: #ffffff;
+    color: #000000;
+
+    width: fit-content;
+    align-self: flex-start;
 }
 
 ::selection {
-  background-color: #ffffff; /* Sets the background color of the selection */
-  color: #000000; /* Sets the text color within the selection */
+    background-color: #ffffff; /* Sets the background color of the selection */
+    color: #000000; /* Sets the text color within the selection */
 }

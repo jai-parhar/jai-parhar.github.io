@@ -62,18 +62,7 @@ for (let i = 0; i < MAX_STARS; i++) {
 
 let doorHover = false; // SET THIS TO TRUE WHEN MOUSING OVER THE ENTRANCE
 let doorClicked = false;
-const door = document.getElementById("door");
-const header = document.getElementById("header");
-const doorImage = document.getElementById("door-image");
-door.addEventListener("mouseenter", () => {
-    doorHover = true;
-});
-door.addEventListener("mouseleave", () => {
-    doorHover = false;
-});
-door.addEventListener("click", () => {
-    doorClicked = true;
-});
+
 
 function update() {
     // Performs one step of the update
@@ -87,54 +76,10 @@ function update() {
         }
     }
 
-    if (doorHover || doorClicked) {
-        startTone(100);
-    } else {
-        stopTone();
-    }
-
-
-    if (doorClicked) {
-        header.classList.add("clicked");
-        doorImage.src = "./res/dooropen_white.png";
-        // TODO: SEND TO NEXT PAGE
-        setTimeout(() => {
-            window.location.href = "../ILOVEYOU/"; // OH SEND EM AWAY!
-        }, 3000);
-    } else {
-        if (doorHover) {
-            header.classList.add("hovering");
-            doorImage.src = "./res/dooropen_white.png";
-        } else {
-            header.classList.remove("hovering");
-            doorImage.src = "./res/doorclosed_white.png";
-        }
-    }
 
 }
 
 
-// IM TRYING SOMETHING
-let audioCtx = null;
-let oscillator = null;
-function startTone(frequency = 440) {
-    if (!audioCtx) audioCtx = new AudioContext();
-    if (oscillator) return; // Already playing
-
-    oscillator = audioCtx.createOscillator();
-    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-    
-    oscillator.connect(audioCtx.destination);
-    oscillator.start();
-}
-
-function stopTone() {
-    if (oscillator) {
-        oscillator.stop();
-        oscillator.disconnect();
-        oscillator = null;
-    }
-}
 
 
 
