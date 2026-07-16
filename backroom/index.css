@@ -30,11 +30,21 @@ body {
     display: flex;
     justify-content: center; /* horizontal */
     align-items: center;     /* vertical */
+
+    flex-direction: column;
+
+    gap: 5vh;
 }
 
 #header {
     font-size: xx-large;
     text-align: center;
+}
+
+#door img {
+    width: 10vw;
+    height: auto;
+    image-rendering: pixelated;
 }
 
 #content {
@@ -49,8 +59,8 @@ body {
     /*width: 100%; /* Optional: adjust as needed */
 }
 
-#header:hover,
 #header.clicked,
+#header.hovering,
 #header::selection {
   background-color: #ffffff; /* Sets the background color of the selection */
   color: #000000; /* Sets the text color within the selection */

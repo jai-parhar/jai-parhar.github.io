@@ -60,6 +60,21 @@ for (let i = 0; i < MAX_STARS; i++) {
     stars.push(new Star());
 }
 
+let doorHover = false; // SET THIS TO TRUE WHEN MOUSING OVER THE ENTRANCE
+let doorClicked = false;
+const door = document.getElementById("door");
+const header = document.getElementById("header");
+const doorImage = document.getElementById("door-image");
+door.addEventListener("mouseenter", () => {
+    doorHover = true;
+});
+door.addEventListener("mouseleave", () => {
+    doorHover = false;
+});
+door.addEventListener("click", () => {
+    doorClicked = true;
+});
+
 function update() {
     // Performs one step of the update
 
@@ -78,19 +93,21 @@ function update() {
         stopTone();
     }
 
-}
 
-let doorHover = false; // SET THIS TO TRUE WHEN MOUSING OVER THE ENTRANCE
-let doorClicked = false;
-function draw() {
-    if (!doorHover && !doorClicked) {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+    if (doorClicked) {
+        header.classList.add("clicked");
+        doorImage.src = "./res/dooropen_white.png";
+        // TODO: SEND TO NEXT PAGE
+    } else {
+        if (doorHover) {
+            header.classList.add("hovering");
+            doorImage.src = "./res/dooropen_white.png";
+        } else {
+            header.classList.remove("hovering");
+            doorImage.src = "./res/doorclosed_white.png";
+        }
     }
 
-    context.fillStyle = "rgb(255, 255, 255)";
-    for (let i = 0; i < stars.length; i++) {
-        stars[i].draw();
-    }
 }
 
 
@@ -116,20 +133,18 @@ function stopTone() {
     }
 }
 
-// Test for if shouldClear should be false
-// This is a temporary check, at some point replace this when you click on the door
-const door = document.querySelector("#header"); // Replace this with door element at some point
-door.addEventListener("mouseenter", () => {
-    doorHover = true;
-});
-door.addEventListener("mouseleave", () => {
-    doorHover = false;
-});
-door.addEventListener("click", () => {
-    doorClicked = true;
-    door.classList.add("clicked")
-});
 
+
+function draw() {
+    if (!doorHover && !doorClicked) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    context.fillStyle = "rgb(255, 255, 255)";
+    for (let i = 0; i < stars.length; i++) {
+        stars[i].draw();
+    }
+}
 
 
 
