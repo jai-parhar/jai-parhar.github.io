@@ -244,6 +244,36 @@ function clamp(x, min, max) {
     }
 }
 
+
+
+// WELCOME TO SUPER SECRET!!!!!!!!!!!!!
+const SUPER_SECRET_PASSWORD = "RECLUSE".split("");
+var password_input = [];
+
+// Ohhhh theyre typing in the super secret password omg 
+document.addEventListener("keydown", (event) => {
+    // Okay even you should be able to figure out what this next line does
+    // I love you darling but sometimes you can chill out a bit with the comments
+    password_input.push(event.key.toUpperCase());
+
+    console.log(password_input)
+
+    // Tooooooo manyyyyy lettterrrrsssss
+    if (password_input.length > SUPER_SECRET_PASSWORD.length) {
+        password_input.shift(); // GET RID OF EM!
+    }
+
+    // OHHH THEY IN
+    if (password_input.join("") == SUPER_SECRET_PASSWORD.join("")) {
+        window.location.href = "backroom/index.html"; // OH SEND EM AWAY!
+    }
+});
+
+// OKAY BYE
+
+
+
+// okay yeah actually gotta do the animation stuff now wonderful
 var stop = false;
 var frameCount = 0;
 var fps, fpsInterval, startTime, now, then, elapsed;
