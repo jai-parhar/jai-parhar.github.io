@@ -98,9 +98,6 @@ function update() {
         header.classList.add("clicked");
         doorImage.src = "./res/dooropen_white.png";
         // TODO: SEND TO NEXT PAGE
-        setTimeout(() => {
-            window.location.href = "../ILOVEYOU/"; // OH SEND EM AWAY!
-        }, 3000);
     } else {
         if (doorHover) {
             header.classList.add("hovering");
