@@ -72,11 +72,18 @@ function update() {
         }
     }
 
+    if (doorHover || doorClicked) {
+        startTone(100);
+    } else {
+        stopTone();
+    }
+
 }
 
-let shouldClear = true; // SET THIS TO FALSE WHEN MOUSING OVER THE ENTRANCE
+let doorHover = false; // SET THIS TO TRUE WHEN MOUSING OVER THE ENTRANCE
+let doorClicked = false;
 function draw() {
-    if (shouldClear) {
+    if (!doorHover && !doorClicked) {
         context.clearRect(0, 0, canvas.width, canvas.height);
     }
 
@@ -87,16 +94,42 @@ function draw() {
 }
 
 
+// IM TRYING SOMETHING
+let audioCtx = null;
+let oscillator = null;
+function startTone(frequency = 440) {
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (oscillator) return; // Already playing
+
+    oscillator = audioCtx.createOscillator();
+    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+    
+    oscillator.connect(audioCtx.destination);
+    oscillator.start();
+}
+
+function stopTone() {
+    if (oscillator) {
+        oscillator.stop();
+        oscillator.disconnect();
+        oscillator = null;
+    }
+}
 
 // Test for if shouldClear should be false
 // This is a temporary check, at some point replace this when you click on the door
 const door = document.querySelector("#header"); // Replace this with door element at some point
 door.addEventListener("mouseenter", () => {
-    shouldClear = false;
+    doorHover = true;
 });
 door.addEventListener("mouseleave", () => {
-    shouldClear = true;
+    doorHover = false;
 });
+door.addEventListener("click", () => {
+    doorClicked = true;
+    door.classList.add("clicked")
+});
+
 
 
 

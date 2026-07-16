@@ -50,6 +50,7 @@ body {
 }
 
 #header:hover,
+#header.clicked,
 #header::selection {
   background-color: #ffffff; /* Sets the background color of the selection */
   color: #000000; /* Sets the text color within the selection */
