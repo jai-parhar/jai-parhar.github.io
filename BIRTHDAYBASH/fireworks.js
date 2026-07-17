@@ -13,14 +13,16 @@ const fireworks = new Fireworks.default(container, {
 let partyStrings = [
     "TURN IT UP!", 
     "KEEP GOING!", 
-    "YEAH BABY WOOOOO!", 
+    "WOOOOOOOOOO!", 
     "BIG PARTY HAPPY BIRTHDAY!", 
     "YES MORE FIREWORKS!",
-    "LETS FUCKING GO!!!!!!"
+    "LETS GO!!!!!!"
 ];
 
+const tunes = document.getElementById('tunes');
 const partyButton = document.getElementById("STARTTHEPARTY");
 partyButton.addEventListener("click", () => {
+    tunes.play();
     if (currStringIndex < partyStrings.length - 1) {
 
         currStringIndex += 1;
