@@ -16,26 +16,15 @@
 <body>
     <div id="background" class="fireworks"></div>
     
-    <!-- jsDelivr  -->
     <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
-
-    <script>
-        const container = document.querySelector('.fireworks');
-        const fireworks = new Fireworks.default(container, {
-            intensity:1000,
-            rocketsPoint: {
-                min: 100,
-                max: 0
-            }
-        });
-        fireworks.start();
-    </script>
 
     <div id="foreground">
         <div id="header">HAPPY BIRTHDAY CADENCE</div>
         <img src="jumping cat gif.gif"></img>
+        <div id="STARTTHEPARTY">START THE PARTY</div>
     </div>
-
+    
+    <script src="fireworks.js"></script>
     <script src="textshimmer.js"></script>
 </body>
 </html>
