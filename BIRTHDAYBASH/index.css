@@ -6,6 +6,14 @@
     font-display: swap; /* Optional: Controls how the font is displayed while loading */
 }
 
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
 body {
     font-family: 'VCR OSD Mono';
     /* margin-top: 2.5vw; */
@@ -37,7 +45,8 @@ body {
 } */
 
 #foreground {
-    min-height: 100vh;
+    height: 100dvh;
+    width: 100vw;
 
     display: flex;
     justify-content: center; /* horizontal */
