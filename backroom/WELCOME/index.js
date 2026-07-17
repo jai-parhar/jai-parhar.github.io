@@ -67,13 +67,18 @@ const header = document.getElementById("header");
 const doorImage = document.getElementById("door-image");
 door.addEventListener("mouseenter", () => {
     doorHover = true;
+    startTone(100);
 });
 door.addEventListener("mouseleave", () => {
     doorHover = false;
+    if (!doorClicked) {
+        stopTone();
+    }
 });
 door.addEventListener("click", () => {
     doorClicked = true;
     // TODO: SEND TO NEXT PAGE
+    startTone(100);
     setTimeout(() => {
         window.location.href = "../ILOVEYOU/"; // OH SEND EM AWAY!
     }, 3000);
@@ -90,13 +95,6 @@ function update() {
             stars[i].x = Math.random() * windowW;
         }
     }
-
-    if (doorHover || doorClicked) {
-        startTone(100);
-    } else {
-        stopTone();
-    }
-
 
     if (doorClicked) {
         header.classList.add("clicked");
@@ -118,16 +116,37 @@ function update() {
 let audioCtx = null;
 let oscillator = null;
 function startTone(frequency = 440) {
-    if (!audioCtx) audioCtx = new AudioContext();
-    if (oscillator) return; // Already playing
+
+    // If you dont have a context make one I love you!
+    if (!audioCtx) {
+        audioCtx = new window.AudioContext();
+    }
+
+    // FIREFOX SUCK MY DICK
+    // LET ME DO WHATEVER I WANT FUCKER
+    if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+    }
+
+    // YOU ALREADY GOT ONE
+    if (oscillator) return;
 
     oscillator = audioCtx.createOscillator();
-    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-    
+
+    // Params bro. It's all params
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        audioCtx.currentTime
+    );
+
+    // SENDEROFF
     oscillator.connect(audioCtx.destination);
     oscillator.start();
 }
 
+
+// SHUT THE FUCK
 function stopTone() {
     if (oscillator) {
         oscillator.stop();
@@ -190,7 +209,6 @@ let fps, fpsInterval, startTime, now, then, elapsed;
 
 // initialize the timer variables and start the animation
 function startAnimating(fps) {
-    //startDropper();
     fpsInterval = 1000 / fps;
     then = Date.now();
     startTime = then;
