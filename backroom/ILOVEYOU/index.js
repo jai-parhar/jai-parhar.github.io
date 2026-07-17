@@ -17,26 +17,31 @@ function resizeCanvas() {
 // Run once at start to get the window to the correct size
 resizeCanvas();
 
+const testSpider = new Spider(400, 400);
 const testWeb = new WebSegment(100, 100, 700, 400, 800, 400);
 
 
 let mouseX = 0;
 let mouseY = 0;
-canvas.addEventListener("mousemove", function(event) {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-    // This is working just bs with the foreground
+// canvas.addEventListener("mousemove", function(event) {
+//     mouseX = event.clientX;
+//     mouseY = event.clientY;
+//     // This is working just bs with the foreground
+// });
+canvas.addEventListener("click", function(event){
+    testSpider.walkTo(event.clientX, event.clientY);
 });
-
 
 function update() {
     // Performs one step of the update
     testWeb.updateParams({x2: mouseX, y2:mouseY});
+    testSpider.update();
 }
 
 function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     testWeb.draw(context);
+    testSpider.draw(context);
 }
 
 

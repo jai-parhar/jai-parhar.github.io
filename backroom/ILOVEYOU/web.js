@@ -147,3 +147,99 @@ class WebSegment {
         context.stroke();
     }
 }
+
+
+const SIZE = 50;
+const WALKSPEED = 5;
+const TURNSPEED = 0.08;
+const posThreshold = 3;
+const angleThreshold = 0.1;
+const SPRITES = [
+    new Image(), new Image(), new Image()
+];
+const framesPerSprite = 10;
+SPRITES[0].src = "./res/spiderneutral.png";
+SPRITES[1].src = "./res/spiderspritestep.png";
+SPRITES[2].src = "./res/spiderspritestepflipped.png";
+class Spider {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.desiredx = x;
+        this.desiredy = y;
+        this.theta = 0;
+        this.desiredtheta = 0;
+        this.moving = false;
+        this.animate = false;
+        this.animFrame = 0;
+        this.animFrameCount = 0;
+    }
+
+    walkTo(x, y) {
+        this.desiredx = x - SIZE/2;
+        this.desiredy = y - SIZE/2;
+    }
+
+    update() {
+        this.animFrameCount += 1;
+
+        // Move to point
+        if (Math.abs(this.desiredx - this.x) <= posThreshold && // check if already close enough to position
+            Math.abs(this.desiredy - this.y) <= posThreshold) {
+                this.moving = false;
+                this.animate = false;
+        } else { // if not already close enough
+            // find angle to get to position
+            //this.moving = true;
+            this.desiredtheta = Math.atan2(-(this.desiredy - this.y), this.desiredx - this.x);
+        }
+        if (Math.abs(this.desiredtheta - this.theta) > angleThreshold) { // check if angle NOT close enough to desired angle
+            this.animate = true;
+            if (this.desiredtheta - this.theta > 0) {
+                this.theta += TURNSPEED;
+            } else {
+                this.theta -= TURNSPEED;
+            }
+            if (Math.abs(this.desiredtheta - this.theta) > Math.PI/4) { // difference between angles is more than 90 degrees
+                this.moving = false;
+            }
+            else {
+                this.moving = true;
+            }
+        }
+
+        if (this.moving) {
+            this.animate = true;
+            this.x += WALKSPEED * Math.cos(this.theta);
+            this.y -= WALKSPEED * Math.sin(this.theta);
+        }
+
+        if (this.animate) {
+            if (this.animFrameCount >= framesPerSprite) {
+                this.animFrame += 1;
+                this.animFrameCount = 0;
+            }
+        }
+    }
+
+    draw(context) {
+
+        context.save();
+        context.translate(this.x + SIZE/2, this.y + SIZE/2);
+        context.rotate(-Math.PI/2 - this.theta);
+        context.imageSmoothingEnabled = false;
+        if (!this.animate) {
+            context.drawImage(SPRITES[0], -SIZE/2, -SIZE/2, SIZE, SIZE);
+        }
+        else {
+            if (this.animFrame % 2) {
+                context.drawImage(SPRITES[1], -SIZE/2, -SIZE/2, SIZE, SIZE);
+            } else {
+                context.drawImage(SPRITES[2], -SIZE/2, -SIZE/2, SIZE, SIZE);
+            }
+        }
+
+        context.restore();
+    }
+    
+}
