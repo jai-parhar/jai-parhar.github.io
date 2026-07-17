@@ -12,7 +12,7 @@ const fireworks = new Fireworks.default(container, {
 
 let partyStrings = [
     "TURN IT UP!", 
-    "KEEP GOING!", 
+    "KEEP CLICKING!", 
     "WOOOOOOOOOO!", 
     "BIG PARTY HAPPY BIRTHDAY!", 
     "YES MORE FIREWORKS!",
