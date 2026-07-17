@@ -16,7 +16,7 @@ let partyStrings = [
     "WOOOOOOOOOO!", 
     "BIG PARTY HAPPY BIRTHDAY!", 
     "YES MORE FIREWORKS!",
-    "LETS GO!!!!!!"
+    "LFG!!!!!!"
 ];
 
 const tunes = document.getElementById('tunes');
