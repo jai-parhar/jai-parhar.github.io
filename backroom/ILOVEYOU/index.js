@@ -20,21 +20,22 @@ resizeCanvas();
 // const testSpider = new Spider(400, 400);
 // const testWeb = new WebSegment(100, 100, 700, 400, 800, 400);
 
-const testWeb = new SpiderWeb(new Spider(0, 400));
+const testWeb = new SpiderWeb(new Spider(-100, -100));
 
 
-let mouseX = 0;
-let mouseY = 0;
-// canvas.addEventListener("mousemove", function(event) {
-//     mouseX = event.clientX;
-//     mouseY = event.clientY;
-//     // This is working just bs with the foreground
+// canvas.addEventListener("click", function(event){
+//     //testSpider.walkTo(event.clientX, event.clientY);
+//     testWeb.addNode(event.clientX, event.clientY);
+//     //testWeb.moveSpider(event.clientX, event.clientY);
 // });
-canvas.addEventListener("click", function(event){
-    //testSpider.walkTo(event.clientX, event.clientY);
-    testWeb.addNode(event.clientX, event.clientY);
-    //testWeb.moveSpider(event.clientX, event.clientY);
-});
+
+setInterval(() => {
+    let randX = (1.1*Math.random() - 0.05)*windowW;
+    let randY = (1.1*Math.random() - 0.05)*windowH;
+    console.log(randX);
+    console.log(randY);
+    testWeb.addNode(randX, randY);
+}, 1000);
 
 function update() {
     // Performs one step of the update

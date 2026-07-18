@@ -274,8 +274,10 @@ class SpiderWeb {
 
     // Add a node but don't overwrite
     addNode(x, y) {
-        this.webSegs.push(new WebSegment(this.spider.x + SIZE/2, this.spider.y + SIZE/2, this.spider.x + SIZE/2, this.spider.y + SIZE/2, MIN_WEBLENGTH));
-        this.spider.walkTo(x, y);
+        if (!this.spider.moving) {
+            this.webSegs.push(new WebSegment(this.spider.x + SIZE/2, this.spider.y + SIZE/2, this.spider.x + SIZE/2, this.spider.y + SIZE/2, MIN_WEBLENGTH));
+            this.spider.walkTo(x, y);
+        }
     }
 
     // fugging put a new one in there who cares man shit
