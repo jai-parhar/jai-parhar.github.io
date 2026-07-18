@@ -215,8 +215,8 @@ class Spider {
             deltaTheta = ((deltaTheta + Math.PI) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI) - Math.PI;
             this.theta += clamp(deltaTheta, -MAX_TURNSPEED, MAX_TURNSPEED);
             
-            // difference between angles is more than 30 degrees, dont start moving until youre facing the right way
-            if (2*Math.abs(deltaTheta) > (Math.PI/4)) {
+            // difference between angles is more than 90 degrees, dont start moving until youre facing the right way
+            if (2*Math.abs(deltaTheta) > (Math.PI/2)) {
                 this.moving = false;
             }
             else {
