@@ -1,3 +1,5 @@
+const clamp = (val, min, max) => Math.max(min, Math.min(val, max));
+
 class WebSegment {
     constructor(x1, y1, x2, y2, webLength, res=40) {
         this.x1 = x1;
@@ -150,10 +152,12 @@ class WebSegment {
 
 
 const SIZE = 50;
-const WALKSPEED = 5;
-const TURNSPEED = 0.08;
-const posThreshold = 3;
-const angleThreshold = 0.1;
+const SPEED_SCALER = 5;
+const TURN_SCALER = 1;
+const MAX_WALKSPEED = 5;
+const MAX_TURNSPEED = 0.08;
+const posThreshold = SIZE/8;
+const angleThreshold = 0.05;
 const SPRITES = [
     new Image(), new Image(), new Image()
 ];
@@ -183,9 +187,11 @@ class Spider {
     update() {
         this.animFrameCount += 1;
 
-        // Move to point
+        // Set desired point to move to
         if (Math.abs(this.desiredx - this.x) <= posThreshold && // check if already close enough to position
             Math.abs(this.desiredy - this.y) <= posThreshold) {
+                this.x = this.desiredx;
+                this.y = this.desiredy;
                 this.moving = false;
                 this.animate = false;
         } else { // if not already close enough
@@ -193,27 +199,41 @@ class Spider {
             //this.moving = true;
             this.desiredtheta = Math.atan2(-(this.desiredy - this.y), this.desiredx - this.x);
         }
+
+        // Manual angle checks idk why the spider still turns wrong but this doesnt hurt yet
+        if (this.theta > Math.PI) { this.theta -= 2 * Math.PI; }
+        if (this.theta < Math.PI) { this.theta += 2 * Math.PI; }
+        if (this.desiredtheta > Math.PI) { this.desiredtheta -= 2 * Math.PI; } // desiredtheta being out of range should be impossible
+        if (this.desiredtheta < Math.PI) { this.desiredtheta += 2 * Math.PI; } // But just in case
+
+        // Turning
         if (Math.abs(this.desiredtheta - this.theta) > angleThreshold) { // check if angle NOT close enough to desired angle
             this.animate = true;
-            if (this.desiredtheta - this.theta > 0) {
-                this.theta += TURNSPEED;
-            } else {
-                this.theta -= TURNSPEED;
-            }
-            if (Math.abs(this.desiredtheta - this.theta) > Math.PI/4) { // difference between angles is more than 90 degrees
+
+            // Correct eq for finding angle difference when shit sucks i die!
+            let deltaTheta = this.desiredtheta - this.theta;
+            deltaTheta = ((deltaTheta + Math.PI) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI) - Math.PI;
+            this.theta += clamp(deltaTheta, -MAX_TURNSPEED, MAX_TURNSPEED);
+            
+            // difference between angles is more than 30 degrees, dont start moving until youre facing the right way
+            if (2*Math.abs(deltaTheta) > (Math.PI/4)) {
                 this.moving = false;
             }
             else {
                 this.moving = true;
             }
+        } else {
+            this.theta = this.desiredtheta;
         }
 
+        // Move
         if (this.moving) {
             this.animate = true;
-            this.x += WALKSPEED * Math.cos(this.theta);
-            this.y -= WALKSPEED * Math.sin(this.theta);
+            this.x += MAX_WALKSPEED * Math.cos(this.theta);
+            this.y -= MAX_WALKSPEED * Math.sin(this.theta);
         }
 
+        // Animate
         if (this.animate) {
             if (this.animFrameCount >= framesPerSprite) {
                 this.animFrame += 1;
@@ -241,5 +261,52 @@ class Spider {
 
         context.restore();
     }
+    
+}
+
+const WEBSAG = 0.001; // Added % length to web to make it sag a bit
+const MIN_WEBLENGTH = 0.1;
+class SpiderWeb {
+    constructor(spider) {
+        this.spider = spider;
+        this.webSegs = [];
+    }
+
+    // Add a node but don't overwrite
+    addNode(x, y) {
+        this.webSegs.push(new WebSegment(this.spider.x + SIZE/2, this.spider.y + SIZE/2, this.spider.x + SIZE/2, this.spider.y + SIZE/2, MIN_WEBLENGTH));
+        this.spider.walkTo(x, y);
+    }
+
+    // fugging put a new one in there who cares man shit
+    forceNode(x, y) {
+        this.webSegs.push(new WebSegment(this.spider.x + SIZE/2, this.spider.y + SIZE/2, this.spider.x + SIZE/2, this.spider.y + SIZE/2, MIN_WEBLENGTH));
+        this.spider.walkTo(x, y);
+    }
+
+    moveSpider(x, y) {
+        this.spider.walkTo(x, y);
+    }
+
+    update() {
+        this.spider.update();
+        if (this.webSegs.length != 0) {
+            let dist = Math.sqrt((this.spider.x + SIZE/2 - this.webSegs.at(-1).x1)**2 
+                        + (this.spider.y + SIZE/2 - this.webSegs.at(-1).y1)**2);
+            let scaledDist = (1 + WEBSAG) * dist;
+            this.webSegs.at(-1).updateParams({x2: this.spider.x + SIZE/2, y2: this.spider.y + SIZE/2, webLength: scaledDist});
+        }
+    }
+
+    drawWeb(context) {
+        for (let i = 0; i < this.webSegs.length; i++) {
+            this.webSegs[i].draw(context);
+        }
+    }
+
+    drawSpider(context) {
+        this.spider.draw(context);
+    }
+
     
 }
