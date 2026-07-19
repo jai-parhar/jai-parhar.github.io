@@ -20,22 +20,17 @@ resizeCanvas();
 // const testSpider = new Spider(400, 400);
 // const testWeb = new WebSegment(100, 100, 700, 400, 800, 400);
 
-const testWeb = new SpiderWeb(new Spider(-100, -100));
+const testWeb = new SpiderWeb(new Spider(windowW/2, windowH/2));
+//testWeb.forceSpider(windowW/2, windowH/2);
+
+const webNodes = generateWebNodes(windowW/2, windowH/2, windowW, windowH);
+//const testPath = [{x:100, y:100, noweb:true}, {x:400, y:400, noweb:false}, {x:100, y:400}, {x:400, y:100}, {x:100, y:100, noweb:true}];
+const testPath = generatePathFromWebNodes(webNodes);
 
 
-// canvas.addEventListener("click", function(event){
-//     //testSpider.walkTo(event.clientX, event.clientY);
-//     testWeb.addNode(event.clientX, event.clientY);
-//     //testWeb.moveSpider(event.clientX, event.clientY);
-// });
-
-setInterval(() => {
-    let randX = (1.1*Math.random() - 0.05)*windowW;
-    let randY = (1.1*Math.random() - 0.05)*windowH;
-    console.log(randX);
-    console.log(randY);
-    testWeb.addNode(randX, randY);
-}, 1000);
+setTimeout(() => {
+    testWeb.spinWebAlongPath(testPath);
+}, 3000);
 
 function update() {
     // Performs one step of the update

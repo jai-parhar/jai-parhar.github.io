@@ -173,7 +173,8 @@ class Spider {
         this.desiredy = y;
         this.theta = 0;
         this.desiredtheta = 0;
-        this.moving = false;
+        this.walking = false;
+        this.moving = false; // turning + walking
         this.animate = false;
         this.animFrame = 0;
         this.animFrameCount = 0;
@@ -193,6 +194,7 @@ class Spider {
                 this.x = this.desiredx;
                 this.y = this.desiredy;
                 this.moving = false;
+                this.walking = false;
                 this.animate = false;
         } else { // if not already close enough
             // find angle to get to position
@@ -201,6 +203,7 @@ class Spider {
         }
 
         // Manual angle checks idk why the spider still turns wrong but this doesnt hurt yet
+        // I feel like this shouldnt actually do anything but removing these lines fucking bricks it
         if (this.theta > Math.PI) { this.theta -= 2 * Math.PI; }
         if (this.theta < Math.PI) { this.theta += 2 * Math.PI; }
         if (this.desiredtheta > Math.PI) { this.desiredtheta -= 2 * Math.PI; } // desiredtheta being out of range should be impossible
@@ -217,17 +220,19 @@ class Spider {
             
             // difference between angles is more than 90 degrees, dont start moving until youre facing the right way
             if (2*Math.abs(deltaTheta) > (Math.PI/2)) {
-                this.moving = false;
+                this.moving = true;
+                this.walking = false;
             }
             else {
                 this.moving = true;
+                this.walking = true;
             }
         } else {
             this.theta = this.desiredtheta;
         }
 
         // Move
-        if (this.moving) {
+        if (this.walking) {
             this.animate = true;
             this.x += MAX_WALKSPEED * Math.cos(this.theta);
             this.y -= MAX_WALKSPEED * Math.sin(this.theta);
@@ -270,33 +275,59 @@ class SpiderWeb {
     constructor(spider) {
         this.spider = spider;
         this.webSegs = [];
+        this.path = [];
+        this.attached = false;
     }
 
     // Add a node but don't overwrite
     addNode(x, y) {
         if (!this.spider.moving) {
-            this.webSegs.push(new WebSegment(this.spider.x + SIZE/2, this.spider.y + SIZE/2, this.spider.x + SIZE/2, this.spider.y + SIZE/2, MIN_WEBLENGTH));
-            this.spider.walkTo(x, y);
+            this.forceNode(x, y);
         }
     }
 
     // fugging put a new one in there who cares man shit
     forceNode(x, y) {
-        this.webSegs.push(new WebSegment(this.spider.x + SIZE/2, this.spider.y + SIZE/2, this.spider.x + SIZE/2, this.spider.y + SIZE/2, MIN_WEBLENGTH));
+        this.webSegs.push(new WebSegment(this.spider.x + SIZE/2, 
+                this.spider.y + SIZE/2, this.spider.x + SIZE/2, this.spider.y + SIZE/2, MIN_WEBLENGTH));
+        this.attached = true;
         this.spider.walkTo(x, y);
     }
 
-    moveSpider(x, y) {
+    // move spider to location overwriting everything else
+    forceSpider(x, y) {
+        this.attached = false;
         this.spider.walkTo(x, y);
+    }
+
+    // move spider but dont like. be annoying about it.
+    moveSpider(x, y) {
+        if(!this.spider.moving) {
+            this.forceNode(x, y);
+        }
     }
 
     update() {
         this.spider.update();
-        if (this.webSegs.length != 0) {
+        if (this.webSegs.length != 0 && this.attached) {
             let dist = Math.sqrt((this.spider.x + SIZE/2 - this.webSegs.at(-1).x1)**2 
                         + (this.spider.y + SIZE/2 - this.webSegs.at(-1).y1)**2);
             let scaledDist = (1 + WEBSAG) * dist;
             this.webSegs.at(-1).updateParams({x2: this.spider.x + SIZE/2, y2: this.spider.y + SIZE/2, webLength: scaledDist});
+        }
+
+        if (!this.spider.moving && this.pathing) {
+            if (this.currPathIndex < this.path.length) {
+                if (this.path[this.currPathIndex].noweb) { // dont lay web if this is true
+                    this.forceSpider(this.path[this.currPathIndex].x, this.path[this.currPathIndex].y);
+                } else {
+                    this.forceNode(this.path[this.currPathIndex].x, this.path[this.currPathIndex].y);
+                }
+                this.currPathIndex += 1;
+            } else {
+                this.pathing = false;
+                this.path = [];
+            }
         }
     }
 
@@ -310,5 +341,128 @@ class SpiderWeb {
         this.spider.draw(context);
     }
 
-    
+    spinWebAlongPath(path) {
+        if (!this.pathing) { // check if already pathing
+            this.path = path;
+            this.pathing = true;
+            this.currPathIndex = 0;
+        }
+    }
+}
+
+function generateWebNodes(cx, cy, width, height, options = {}) {
+
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    function random(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    const spokes = options.spokes ?? randomInt(10, 14);
+    const rings = options.rings ?? randomInt(7, 12);
+
+    const minRingSpacing = options.minRingSpacing ?? 20;
+    const maxRingSpacing = options.maxRingSpacing ?? 35;
+
+    const spokeAngleJitter = options.spokeAngleJitter ?? 0.1;
+    const ringRotationJitter = options.ringRotationJitter ?? 0.06;
+
+    const ringWobble = options.ringWobble ?? 8;
+    const pointJitter = options.pointJitter ?? 3;
+
+
+    // get distance to edge of window depending on the angle
+    function distanceToEdge(angle) {
+        const dx = Math.cos(angle);
+        const dy = Math.sin(angle);
+
+        let distance = Infinity;
+        if (dx > 0) { distance = Math.min(distance, (width - cx) / dx); }
+        else if (dx < 0) { distance = Math.min(distance, -cx / dx); }
+
+        if (dy > 0) { distance = Math.min(distance, (height - cy) / dy); }
+        else if (dy < 0) { distance = Math.min(distance, -cy / dy); }
+
+        return distance;
+    }
+
+    let web = []; // web points
+    let spokesData = []; // spoke angles and lengths
+    for (let s = 0; s < spokes; s++) { // generate the spokes by adjusting by angles randomly and seeing to edge
+        let angle = s * Math.PI * 2 / spokes + random(-spokeAngleJitter, spokeAngleJitter);
+        spokesData.push({ angle: angle, length: distanceToEdge(angle)});
+    }
+
+    // add centerpoint to web
+    web.push([{x: cx, y: cy, ring: 0, spoke: -1}]);
+
+    // generate the rings
+    for (let r = 1; r <= rings; r++) {
+        let ring = [];
+        let progress = r / rings;
+        for (let s = 0; s < spokes; s++) {
+            let spoke = spokesData[s];
+            let angle = spoke.angle;
+            let distance = spoke.length * progress;
+
+            // only distort inner rings angles, distorting outer ones changes if outer touches edge so cant do that
+            if (r !== rings) {
+                distance += random(-ringWobble, ringWobble);
+                angle += random(-ringRotationJitter, ringRotationJitter);
+            }
+
+            let x = cx + Math.cos(angle) * distance;
+            let y = cy + Math.sin(angle) * distance;
+
+            // extra point jitter on rings, this makes it look very slightly better
+            // dont do to outer ring because then it wont touch edge
+            if (r !== rings) {
+                x += random(-pointJitter, pointJitter);
+                y += random(-pointJitter, pointJitter);
+            }
+
+            ring.push({x, y, ring: r, spoke: s});
+        }
+        web.push(ring);
+    }
+    return web;
+}
+
+function generatePathFromWebNodes(web) {
+    let path = [];
+
+    console.log(web);
+
+    // STEP 0: GO TO CENTER OF THE WEB TO START
+    path.push({x: web[0][0].x, y: web[0][0].y, noweb:true});
+
+    const spokes = web[1].length; // num points in a ring
+    const rings = web.length - 1; // num points along a spoke, dont include center point 
+
+    // STEP 1: BUILD THE SPOKES
+    for (let s = 0; s < spokes; s++) {
+        path.push({x: web[0][0].x, y: web[0][0].y, noweb:false});
+        for (let r = 1; r <= rings; r++) {
+            path.push({x: web[r][s].x, y: web[r][s].y, noweb:false}); // add the spoke
+        }
+        path.push({x: web[0][0].x, y: web[0][0].y, noweb:true}); // return to center
+    }
+
+    // STEP 2: BUILD THE RINGS
+    for (let r = rings; r >= 1; r--) {
+        let start = Math.floor(Math.random() * spokes); // start at a random spoke each time
+        
+        path.push({x: web[r][start].x, y: web[r][start].y, noweb: true}); // go to spiral starting point
+
+        for (let i = 0; i < spokes; i++) {
+            let s = (start + i) % spokes;
+            path.push({x: web[r][s].x, y:web[r][s].y, noweb:false});
+        }
+
+        path.push({x: web[r][start].x, y: web[r][start].y, noweb: false}); // finish the ring
+    }
+
+    return path;
 }
