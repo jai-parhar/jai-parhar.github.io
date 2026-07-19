@@ -154,8 +154,8 @@ class WebSegment {
 const SIZE = 50;
 const SPEED_SCALER = 5;
 const TURN_SCALER = 1;
-const MAX_WALKSPEED = 5;
-const MAX_TURNSPEED = 0.08;
+const MAX_WALKSPEED = 4; // set to 3-5 normally
+const MAX_TURNSPEED = 0.08; // set to 0.08 normally
 const posThreshold = SIZE/8;
 const angleThreshold = 0.05;
 const SPRITES = [
@@ -452,6 +452,7 @@ function generatePathFromWebNodes(web) {
 
     // STEP 2: BUILD THE RINGS
     for (let r = rings; r >= 1; r--) {
+
         let start = Math.floor(Math.random() * spokes); // start at a random spoke each time
         
         path.push({x: web[r][start].x, y: web[r][start].y, noweb: true}); // go to spiral starting point
@@ -460,7 +461,6 @@ function generatePathFromWebNodes(web) {
             let s = (start + i) % spokes;
             path.push({x: web[r][s].x, y:web[r][s].y, noweb:false});
         }
-
         path.push({x: web[r][start].x, y: web[r][start].y, noweb: false}); // finish the ring
     }
 

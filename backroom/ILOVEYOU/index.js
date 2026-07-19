@@ -23,7 +23,7 @@ resizeCanvas();
 const testWeb = new SpiderWeb(new Spider(windowW/2, windowH/2));
 //testWeb.forceSpider(windowW/2, windowH/2);
 
-const webNodes = generateWebNodes(windowW/2, windowH/2, windowW, windowH);
+const webNodes = generateWebNodes(windowW/4, windowH/4, windowW, windowH);
 //const testPath = [{x:100, y:100, noweb:true}, {x:400, y:400, noweb:false}, {x:100, y:400}, {x:400, y:100}, {x:100, y:100, noweb:true}];
 const testPath = generatePathFromWebNodes(webNodes);
 
