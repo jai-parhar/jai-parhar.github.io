@@ -331,9 +331,9 @@ class SpiderWeb {
         }
     }
 
-    drawWeb(context) {
+    drawWeb(context, colour="white") {
         for (let i = 0; i < this.webSegs.length; i++) {
-            this.webSegs[i].draw(context);
+            this.webSegs[i].draw(context, colour);
         }
     }
 

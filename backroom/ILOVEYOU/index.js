@@ -43,8 +43,8 @@ function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     //testWeb.draw(context);
     //testSpider.draw(context);
+    testWeb.drawWeb(context, "lightgray");
     testWeb.drawSpider(context);
-    testWeb.drawWeb(context);
 }
 
 
