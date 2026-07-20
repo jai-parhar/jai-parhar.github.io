@@ -44,6 +44,20 @@ setTimeout(() => {
     spiderWeb.spinWebAlongPath(webPath);
 }, 3000);
 
+function randomPointOutsideScreen(width, height, margin = 50) {
+    const side = Math.floor(Math.random() * 4);
+    switch (side) {
+        case 0: // Top
+            return { x: Math.random() * width, y: -margin };
+        case 1: // Right
+            return { x: width + margin, y: Math.random() * height };
+        case 2: // Bottom
+            return { x: Math.random() * width, y: height + margin };
+        case 3: // Left
+            return { x: -margin, y: Math.random() * height };
+    }
+}
+
 canvas.addEventListener("click", (event)=>{
     flies.push(new Fly(event.clientX, event.clientY));
 });
@@ -56,7 +70,7 @@ function update() {
     for (let i = 0; i < flies.length; i++) {
         flies[i].update(windowW, windowH);
         if (flies[i].moving) {
-            if (flies[i].checkSpiderWebCollisions(spiderWeb)) {
+            if (flies[i].checkSpiderWebCollisions(spiderWeb, 0.05)) {
                 flies[i].moving = false;
                 spiderWeb.eatFly(flies[i]);
             }

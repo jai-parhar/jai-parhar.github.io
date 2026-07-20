@@ -389,7 +389,7 @@ class SpiderWeb {
 
                     this.currPathIndex += 1;
 
-                    if (this.currPathIndex + 1 < this.path.length) {
+                    if (this.currPathIndex < this.path.length) {
                          // get ready for next point
 
                         if (this.path[this.currPathIndex].noweb) { // dont lay web if this is true, as just moving to next point
@@ -570,8 +570,8 @@ class Fly {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.theta = 0;
-        this.desiredtheta = 0;
+        this.theta = 2 * (Math.random() - 0.5) * Math.PI;
+        this.desiredtheta = 2 * (Math.random() - 0.5) * Math.PI;
         this.moving = true;
         this.animate = false;
         this.animFrame = 0;
@@ -580,6 +580,7 @@ class Fly {
         this.currFramesPerDirection = Math.random() * (FLY_MAX_FRAMES_PER_DIRECTION - FLY_MIN_FRAMES_PER_DIRECTION) 
                                             + FLY_MIN_FRAMES_PER_DIRECTION;
         this.eaten = false;
+        this.lastTestedSegmentIndex = -1;
     }
 
     update(windowW, windowH) {
@@ -627,10 +628,16 @@ class Fly {
         }
     }
 
-    checkSpiderWebCollisions(spiderWeb) {
+    checkSpiderWebCollisions(spiderWeb, probability = 1) {
         for(let i = 0; i < spiderWeb.webSegs.length; i++) {
-            if (this.checkWebSegmentCollision(spiderWeb.webSegs[i])) {
-                return true;
+            if (i == this.lastTestedSegmentIndex) { // Skip testing this one if the fly didnt get stuck
+                continue;
+            }
+            if (this.checkWebSegmentCollision(spiderWeb.webSegs[i])) { // did it collide?
+                this.lastTestedSegmentIndex = i;
+                if (Math.random() < probability) { // chance to get stuck?
+                    return true;
+                }
             }
         }
         return false;
