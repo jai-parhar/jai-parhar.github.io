@@ -56,9 +56,11 @@ body {
     flex: 1;
 
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     /* align-items: center; */
     align-items: flex-start;
+    
+    flex-direction: column;
 
     text-align: center;
     
@@ -74,7 +76,9 @@ body {
 
 .content-link {
     width: fit-content;
-    align-self: flex-start;
+    align-self: center;
+
+    margin-top: 2vw;
 
     font-size: 16px;
 
