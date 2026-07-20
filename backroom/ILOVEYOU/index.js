@@ -60,6 +60,8 @@ function update() {
                 flies[i].moving = false;
                 spiderWeb.eatFly(flies[i]);
             }
+        } else {
+            spiderWeb.eatFly(flies[i]);
         }
     }
 

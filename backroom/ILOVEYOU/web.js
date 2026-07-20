@@ -372,7 +372,9 @@ class SpiderWeb {
                     this.attached = this.returnAttached; // pick the web back up
 
                     // start pathing back to the point we were going to!
-                    this.forceSpider(this.path[this.currPathIndex].x, this.path[this.currPathIndex].y);
+                    if (this.pathing) {
+                        this.forceSpider(this.path[this.currPathIndex].x, this.path[this.currPathIndex].y);
+                    }
 
                     // This works in the case where the spider dropped a web, but what if it didnt drop a web!
                 }
