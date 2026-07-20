@@ -154,10 +154,10 @@ class WebSegment {
 const SIZE = 50;
 const SPEED_SCALER = 5;
 const TURN_SCALER = 1;
-const MAX_WALKSPEED = 4; // set to 3-5 normally
-const MAX_TURNSPEED = 0.08; // set to 0.08 normally
-const posThreshold = SIZE/8;
-const angleThreshold = 0.05;
+const MAX_WALKSPEED = 10; // set to 3-5 normally
+const MAX_TURNSPEED = 0.2; // set to 0.08 normally
+const posThreshold = SIZE/4;
+const angleThreshold = 0.0001;
 const SPRITES = [
     new Image(), new Image(), new Image()
 ];
