@@ -198,37 +198,39 @@ class Spider {
                 this.animate = false;
         } else { // if not already close enough
             // find angle to get to position
-            //this.moving = true;
+            this.moving = true;
+            this.walking = true;
             this.desiredtheta = Math.atan2(-(this.desiredy - this.y), this.desiredx - this.x);
-        }
 
-        // Manual angle checks idk why the spider still turns wrong but this doesnt hurt yet
-        // I feel like this shouldnt actually do anything but removing these lines fucking bricks it
-        if (this.theta > Math.PI) { this.theta -= 2 * Math.PI; }
-        if (this.theta < Math.PI) { this.theta += 2 * Math.PI; }
-        if (this.desiredtheta > Math.PI) { this.desiredtheta -= 2 * Math.PI; } // desiredtheta being out of range should be impossible
-        if (this.desiredtheta < Math.PI) { this.desiredtheta += 2 * Math.PI; } // But just in case
+            // Manual angle checks idk why the spider still turns wrong but this doesnt hurt yet
+            // I feel like this shouldnt actually do anything but removing these lines fucking bricks it
+            if (this.theta > Math.PI) { this.theta -= 2 * Math.PI; }
+            if (this.theta < -Math.PI) { this.theta += 2 * Math.PI; }
+            if (this.desiredtheta > Math.PI) { this.desiredtheta -= 2 * Math.PI; } // desiredtheta being out of range should be impossible
+            if (this.desiredtheta < -Math.PI) { this.desiredtheta += 2 * Math.PI; } // But just in case
 
-        // Turning
-        if (Math.abs(this.desiredtheta - this.theta) > angleThreshold) { // check if angle NOT close enough to desired angle
-            this.animate = true;
+            // Turning
+            if (Math.abs(this.desiredtheta - this.theta) > angleThreshold) { // check if angle NOT close enough to desired angle
+                this.animate = true;
 
-            // Correct eq for finding angle difference when shit sucks i die!
-            let deltaTheta = this.desiredtheta - this.theta;
-            deltaTheta = ((deltaTheta + Math.PI) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI) - Math.PI;
-            this.theta += clamp(deltaTheta, -MAX_TURNSPEED, MAX_TURNSPEED);
-            
-            // difference between angles is more than 90 degrees, dont start moving until youre facing the right way
-            if (2*Math.abs(deltaTheta) > (Math.PI/2)) {
-                this.moving = true;
-                this.walking = false;
+                // Correct eq for finding angle difference when shit sucks i die!
+                let deltaTheta = this.desiredtheta - this.theta;
+                deltaTheta = ((deltaTheta + Math.PI) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI) - Math.PI;
+                this.theta += clamp(deltaTheta, -MAX_TURNSPEED, MAX_TURNSPEED);
+                
+                // difference between angles is more than 90 degrees, dont start moving until youre facing the right way
+                if (2*Math.abs(deltaTheta) > (Math.PI/2)) {
+                    this.moving = true;
+                    this.walking = false;
+                }
+                else {
+                    this.moving = true;
+                    this.walking = true;
+                }
+            } else {
+                this.theta = this.desiredtheta;
             }
-            else {
-                this.moving = true;
-                this.walking = true;
-            }
-        } else {
-            this.theta = this.desiredtheta;
+
         }
 
         // Move
@@ -248,7 +250,6 @@ class Spider {
     }
 
     draw(context) {
-
         context.save();
         context.translate(this.x + SIZE/2, this.y + SIZE/2);
         context.rotate(-Math.PI/2 - this.theta);
@@ -271,12 +272,14 @@ class Spider {
 
 const WEBSAG = 0.001; // Added % length to web to make it sag a bit
 const MIN_WEBLENGTH = 0.1;
+// rewrite of spiderweb class
 class SpiderWeb {
     constructor(spider) {
         this.spider = spider;
         this.webSegs = [];
         this.path = [];
         this.attached = false;
+        this.pathing = false;
     }
 
     // Add a node but don't overwrite
@@ -296,7 +299,6 @@ class SpiderWeb {
 
     // move spider to location overwriting everything else
     forceSpider(x, y) {
-        this.attached = false;
         this.spider.walkTo(x, y);
     }
 
@@ -307,8 +309,31 @@ class SpiderWeb {
         }
     }
 
+    // stop to go eat fly and then return
+    eatFly(fly) {
+        // First check if this is the first fly that we are seeing after pathing or not
+        if (!this.goEatFly && !this.returningFromFly) { // Not already on the way to eat a fly and not coming back from eating a fly
+            
+            this.returnPoint = {x:this.spider.x + SIZE/2, y:this.spider.y + SIZE/2}; // place we stopped at
+
+            this.returnAttached = this.attached; // do we need to pick back up the web when we get back?
+        }
+
+        this.targetFly = fly; // set the target fly
+
+        this.goEatFly = true; // we are heading to a fly
+        this.returningFromFly = false; // which means we aren't coming back from the fly
+        
+        this.attached = false; // drop the web
+        this.forceSpider(this.targetFly.x + FLY_SIZE/2, this.targetFly.y + FLY_SIZE/2); // set target to the fly
+    }
+
     update() {
+        
+        // Update the spider's movement and animations
         this.spider.update();
+
+        // If we have a web attached, update its position to follow
         if (this.webSegs.length != 0 && this.attached) {
             let dist = Math.sqrt((this.spider.x + SIZE/2 - this.webSegs.at(-1).x1)**2 
                         + (this.spider.y + SIZE/2 - this.webSegs.at(-1).y1)**2);
@@ -316,17 +341,73 @@ class SpiderWeb {
             this.webSegs.at(-1).updateParams({x2: this.spider.x + SIZE/2, y2: this.spider.y + SIZE/2, webLength: scaledDist});
         }
 
-        if (!this.spider.moving && this.pathing) {
-            if (this.currPathIndex < this.path.length) {
-                if (this.path[this.currPathIndex].noweb) { // dont lay web if this is true
+        if (this.goEatFly) { // if there is a fly i need to go eat
+
+            if (this.targetFly.eaten) { // If the fly is already eaten, acknowledge that we are done eating and need to go return
+                this.goEatFly = false;
+                this.returningFromFly = true;
+            }
+
+            if (!this.spider.moving) { // got to the fly
+                this.targetFly.eaten = true; // fly set to eaten, in the next update cycle itll start returning
+            }
+
+        } else { // no flies to eat!
+
+            if (this.returningFromFly) { // got the fly, coming back
+
+                // Path to return point
+                this.forceSpider(this.returnPoint.x, this.returnPoint.y);
+
+                if (!this.spider.moving 
+                && (Math.abs(this.spider.x + SIZE/2 - this.returnPoint.x) < 0.01 
+                && Math.abs(this.spider.y + SIZE/2 - this.returnPoint.y) < 0.01 )) { 
+                    // Are we at return point? we need to go back to what we were doing
+                    // Problem! We are checking if the spider is moving, but in this update cycle, the spider will not have updated this!
+                    // Possible solutions: check if we are close enough to the point, or manually set spider moving to be true
+                    // Cant do the second, as then we never know if we are back!
+                    
+                    this.returningFromFly = false; // we're done getting back
+
+                    this.attached = this.returnAttached; // pick the web back up
+
+                    // start pathing back to the point we were going to!
                     this.forceSpider(this.path[this.currPathIndex].x, this.path[this.currPathIndex].y);
-                } else {
-                    this.forceNode(this.path[this.currPathIndex].x, this.path[this.currPathIndex].y);
+
+                    // This works in the case where the spider dropped a web, but what if it didnt drop a web!
                 }
-                this.currPathIndex += 1;
-            } else {
-                this.pathing = false;
-                this.path = [];
+            }
+            else if (this.pathing) { 
+                // not returning from fly, but want to keep pathing
+
+                if (!this.spider.moving && 
+                (Math.abs(this.spider.x + SIZE/2 - this.path[this.currPathIndex].x) < 0.01 &&
+                Math.abs(this.spider.y + SIZE/2 - this.path[this.currPathIndex].y) < 0.01 )) {
+                    // We are at this point!
+
+                    this.currPathIndex += 1;
+
+                    if (this.currPathIndex + 1 < this.path.length) {
+                         // get ready for next point
+
+                        if (this.path[this.currPathIndex].noweb) { // dont lay web if this is true, as just moving to next point
+                            this.attached = false;
+                            this.forceSpider(this.path[this.currPathIndex].x, this.path[this.currPathIndex].y);
+                        } else {
+                            this.forceNode(this.path[this.currPathIndex].x, this.path[this.currPathIndex].y); // start laying web
+                        }
+
+                    } else {
+                        // all done!
+                        this.pathing = false; 
+                        this.path = [];
+                    }
+
+
+
+                }
+
+
             }
         }
     }
@@ -347,8 +428,11 @@ class SpiderWeb {
             this.pathing = true;
             this.currPathIndex = 0;
         }
+        this.forceSpider(path[0].x, path[0].y);
     }
 }
+
+
 
 function generateWebNodes(cx, cy, width, height, options = {}) {
 
@@ -433,8 +517,6 @@ function generateWebNodes(cx, cy, width, height, options = {}) {
 function generatePathFromWebNodes(web) {
     let path = [];
 
-    console.log(web);
-
     // STEP 0: GO TO CENTER OF THE WEB TO START
     path.push({x: web[0][0].x, y: web[0][0].y, noweb:true});
 
@@ -465,4 +547,134 @@ function generatePathFromWebNodes(web) {
     }
 
     return path;
+}
+
+
+const FLY_SPEED = 8;
+const FLY_SIZE = 11/17 * SIZE;
+const FLY_MIN_FRAMES_PER_DIRECTION = Math.floor(0.05 * 60); // Running at 60 fps
+const FLY_MAX_FRAMES_PER_DIRECTION = Math.floor(0.4 * 60); // Running at 60 fps
+const FLY_MAX_TURNSPEED = 0.06;
+const FLY_SPRITES = [
+    new Image(), new Image()
+];
+const FLY_framesPerSprite = 1;
+FLY_SPRITES[0].src = "./res/flyframe1.png";
+FLY_SPRITES[1].src = "./res/flyframe2.png";
+const FLY_BORDER_MARGIN = 200; // Margin for where the fly should start coming back
+const FLY_CENTER_STEERING_SCALE = 0.5; // idk what to use but higher will lock it more towards the center, dont go higher than 1 or itll fly off
+const FLY_HITBOX_RADIUS = 0.25 * 11/17 * SIZE;
+class Fly {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.theta = 0;
+        this.desiredtheta = 0;
+        this.moving = true;
+        this.animate = false;
+        this.animFrame = 0;
+        this.animFrameCount = 0;
+        this.framesInDirection = 0;
+        this.currFramesPerDirection = Math.random() * (FLY_MAX_FRAMES_PER_DIRECTION - FLY_MIN_FRAMES_PER_DIRECTION) 
+                                            + FLY_MIN_FRAMES_PER_DIRECTION;
+        this.eaten = false;
+    }
+
+    update(windowW, windowH) {
+        this.framesInDirection += 1;
+
+        // Handle movement stuff
+        if (this.moving) {
+            this.x += FLY_SPEED * Math.cos(this.theta);
+            this.y -= FLY_SPEED * Math.sin(this.theta);
+
+            if (this.framesInDirection >= this.currFramesPerDirection) {
+                this.desiredtheta += Math.PI * (Math.random()-0.5); // random angle between -pi/2 and pi/2
+                this.framesInDirection = 0; // reset frame counter
+
+                // generate new length of time for fly to go straight
+                this.currFramesPerDirection = Math.random() * (FLY_MAX_FRAMES_PER_DIRECTION - FLY_MIN_FRAMES_PER_DIRECTION) 
+                                            + FLY_MIN_FRAMES_PER_DIRECTION;
+            }
+
+            // Handle steering back to center of screen
+            if (this.x < FLY_BORDER_MARGIN || this.x > windowW - FLY_BORDER_MARGIN || // handles x
+                this.y < FLY_BORDER_MARGIN || this.y > windowH - FLY_BORDER_MARGIN) { // handles y
+                let centerTheta = Math.atan2(-(windowH / 2 - this.y), windowW / 2 - this.x); // find angle to center
+
+                // Steering desired theta towards center
+                let center_deltaTheta = centerTheta - this.desiredtheta;
+                center_deltaTheta = ((center_deltaTheta + Math.PI) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI) - Math.PI;
+                
+                this.desiredtheta += FLY_CENTER_STEERING_SCALE * center_deltaTheta;
+           }
+
+           let deltaTheta = this.desiredtheta - this.theta;
+            deltaTheta = ((deltaTheta + Math.PI) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI) - Math.PI; // some bs that handles delta angles
+            this.theta += clamp(deltaTheta, -FLY_MAX_TURNSPEED, FLY_MAX_TURNSPEED);
+        }
+
+        // Handle animation stuff
+        this.animate = this.moving; // These are seperate rn in case i need to change, also basing the code on the spider code
+        if (this.animate) {
+            if (this.animFrameCount > FLY_framesPerSprite) {
+                this.animFrame += 1;
+                this.animFrameCount = 0;
+            }
+            this.animFrameCount += 1;
+        }
+    }
+
+    checkSpiderWebCollisions(spiderWeb) {
+        for(let i = 0; i < spiderWeb.webSegs.length; i++) {
+            if (this.checkWebSegmentCollision(spiderWeb.webSegs[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    checkWebSegmentCollision(webSeg) {
+        // Calculate fly center
+        let cx = this.x + FLY_SIZE/2;
+        let cy = this.y + FLY_SIZE/2;
+
+        // get segment vector
+        let dx = webSeg.x2 - webSeg.x1;
+        let dy = webSeg.y2 - webSeg.y1;
+
+        // get vector from segment start to circle center
+        let fx = cx - webSeg.x1;
+        let fy = cy - webSeg.y1;
+
+        // project circle center onto segment
+        let t = (fx * dx + fy * dy) / (dx * dx + dy * dy);
+
+        // clamp projection to segment
+        t = Math.max(0, Math.min(1, t));
+
+        // find closest point on segment
+        let closestX = webSeg.x1 + t * dx;
+        let closestY = webSeg.y1 + t * dy;
+
+        return (cx - closestX)**2 + (cy - closestY)**2 <= FLY_HITBOX_RADIUS**2;
+    }
+
+    draw(context) {
+        context.save();
+        context.translate(this.x + FLY_SIZE/2, this.y + FLY_SIZE/2);
+        context.rotate(Math.PI/2 - this.theta);
+        context.imageSmoothingEnabled = false;
+        
+        context.drawImage(FLY_SPRITES[this.animFrame % 2], -FLY_SIZE/2, -FLY_SIZE/2, FLY_SIZE, FLY_SIZE);
+        
+        context.restore();
+    }
+
+    drawHitbox(context, colour="red") {
+        context.fillStyle = colour;
+        context.beginPath();
+        context.arc(this.x + FLY_SIZE/2, this.y + FLY_SIZE/2, FLY_HITBOX_RADIUS, 0, 2 * Math.PI);
+        context.fill();
+    }
 }

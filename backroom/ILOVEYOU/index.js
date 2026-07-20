@@ -17,34 +17,65 @@ function resizeCanvas() {
 // Run once at start to get the window to the correct size
 resizeCanvas();
 
-// const testSpider = new Spider(400, 400);
-// const testWeb = new WebSegment(100, 100, 700, 400, 800, 400);
 
-const testWeb = new SpiderWeb(new Spider(windowW/2, windowH/2));
-//testWeb.forceSpider(windowW/2, windowH/2);
+const spiderWeb = new SpiderWeb(new Spider(windowW/2, windowH/2));
 
 const webNodes = generateWebNodes(windowW/3, windowH/3, windowW, windowH);
-//const testPath = [{x:100, y:100, noweb:true}, {x:400, y:400, noweb:false}, {x:100, y:400}, {x:400, y:100}, {x:100, y:100, noweb:true}];
-const testPath = generatePathFromWebNodes(webNodes);
+const webPath = generatePathFromWebNodes(webNodes);
+// we need a test path
+// const webPath = [
+//     {x:100, y:100, noweb:true}, 
+//     {x:1200, y:100, noweb:false},
+//     {x:500, y:500, noweb:true},
+//     {x:100, y:100, noweb:true}, 
+//     {x:100, y:100, noweb:true}, 
+//     {x:1200, y:100, noweb:false},
+//     {x:500, y:500, noweb:true},
+//     {x:100, y:100, noweb:true}, 
+//     {x:1200, y:100, noweb:false},
+//     {x:500, y:500, noweb:true}
+// ];
 
+
+//const testFly = new Fly(windowW/2, windowH/2);
+let flies = [];
 
 setTimeout(() => {
-    testWeb.spinWebAlongPath(testPath);
+    spiderWeb.spinWebAlongPath(webPath);
 }, 3000);
+
+canvas.addEventListener("click", (event)=>{
+    flies.push(new Fly(event.clientX, event.clientY));
+});
+
 
 function update() {
     // Performs one step of the update
-    //testWeb.updateParams({x2: mouseX, y2:mouseY});
-    //testSpider.update();
-    testWeb.update();
+    spiderWeb.update();
+
+    for (let i = 0; i < flies.length; i++) {
+        flies[i].update(windowW, windowH);
+        if (flies[i].moving) {
+            if (flies[i].checkSpiderWebCollisions(spiderWeb)) {
+                flies[i].moving = false;
+                spiderWeb.eatFly(flies[i]);
+            }
+        }
+    }
+
+    // handle eaten flies
+    flies = flies.filter(fly => !fly.eaten);
 }
 
 function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    //testWeb.draw(context);
-    //testSpider.draw(context);
-    testWeb.drawWeb(context, "lightgray");
-    testWeb.drawSpider(context);
+    spiderWeb.drawWeb(context, "lightgray");
+    
+    for (let i = 0; i < flies.length; i++) {
+        flies[i].draw(context);
+    }
+    
+    spiderWeb.drawSpider(context);
 }
 
 
