@@ -165,7 +165,7 @@ canvas.addEventListener('mousedown', (event) => {
         const y = event.clientY + cameraY;
 
         if (event.button == 0) { // left click, draw web
-            drawWeb.forceDrawNode(x, y);
+            //drawWeb.forceDrawNode(x, y);
         } else if (event.button == 2) { // right click, move spider
             drawWeb.dropWebAndForceDrawSpider(x, y);
         }

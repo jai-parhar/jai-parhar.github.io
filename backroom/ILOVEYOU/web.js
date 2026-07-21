@@ -311,7 +311,7 @@ class SpiderWeb {
 
         // handle case of nobody drew nothing yet
         if (this.webSegs.length == 0) {
-            this.forceNode(x, y);
+            this.forceSpider(x, y);
             return;
         }
 
