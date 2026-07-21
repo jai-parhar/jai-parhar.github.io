@@ -17,10 +17,19 @@ function resizeCanvas() {
 // Run once at start to get the window to the correct size
 resizeCanvas();
 
-const spiderWeb = new SpiderWeb(new Spider(-100, -100));
+let onMainScreen = true;
+let transitioning = false;
+
+let cameraY = 0;
+
+const spider = new Spider(-100, 100);
+const spiderWeb = new SpiderWeb(spider);
+const drawWeb = new SpiderWeb(spider);
 
 const webNodes = generateWebNodes(windowW/3, windowH/3, windowW, windowH);
 const webPath = generatePathFromWebNodes(webNodes);
+
+
 
 let flies = [];
 
@@ -47,7 +56,7 @@ function spawnFly() {
 }
 
 const feedSpiderButton = document.getElementById("feed-spider-button");
-feedSpiderButton.addEventListener("click", (event)=>{
+feedSpiderButton.addEventListener("click", (event) => {
     spawnFly();
 });
 
@@ -55,7 +64,53 @@ const flyCountElement = document.getElementById("fly-count");
 let fliesEaten = 0;
 
 
+// okay this is dumb but like. this works
+const virtual_transition_fly = new Fly(windowW/2, 2*windowH);
+// the idea is i never update this and i never draw this, but it saves the state for the web
+
+
+const drawWebButton = document.getElementById("draw-web");
+drawWebButton.addEventListener("click", (event) => {
+    // WE OUT HERE EXPLICITY SETTING STATE MACHINE STATES
+    onMainScreen = true; // I SHOULDN'T HAVE TO SET THIS. BUT WHAT IF!
+    transitioning = true;
+});
+
+const goBackButton = document.getElementById("go-back");
+goBackButton.addEventListener("click", (event) => {
+    onMainScreen = false;
+    transitioning = true;
+});
+
+const TRANSITION_SPEED = 10;
 function update() {
+    
+    // makes the html and css follow the camera. fuck. i fucking. im losing my mind.
+    // I genuinely cannot fucking handle this stupid fucking shit. whatever man. shit.
+    // also dont forget second screen starts at 1.5 * windowH. its not windowH.
+    document.getElementById("camera").style.transform = `translateY(-${cameraY}px)`;
+
+    if (onMainScreen && !transitioning) {
+        updateMainScreen();
+    }
+
+    if (!onMainScreen && !transitioning) {
+        // handle updates for drawing the spider stuff
+        updateDrawWebScreen();
+    }
+
+    if (onMainScreen && transitioning) {
+        // handle updates for transitioning down to the draw screen
+        updateTransitionToDrawScreen();
+    }
+
+    if (!onMainScreen && transitioning) {
+        // handle updates for transitioning up to the main screen
+        updateTransitionToMainScreen();
+    }
+}
+
+function updateMainScreen() {
     // Performs one step of the update
     spiderWeb.update();
 
@@ -80,17 +135,79 @@ function update() {
     flies = flies.filter(fly => !fly.eaten);
 }
 
+function updateTransitionToDrawScreen() {
+    flies = flies.filter(fly => fly.y < 1.25 * windowH); // clears the transition area so we wont see a low flying fly
+
+    spiderWeb.update();
+    if (cameraY < 1.5 * windowH) { // camera moving down
+        cameraY += TRANSITION_SPEED;
+        spiderWeb.eatFly(virtual_transition_fly); // 2*windowH because we move 1.5*windowH down
+    } else {
+        if (virtual_transition_fly.eaten) {
+            // Spider at center point
+
+            virtual_transition_fly.eaten = false;
+
+            onMainScreen = false;
+            transitioning = false;
+        }
+    }
+}
+
+// This line prevents right click from doing the stupid right click shit where it opens a stupid menu. im sorry.
+canvas.addEventListener('contextmenu', (event) => { event.preventDefault(); });
+
+// anytime the mouse gets clicked
+canvas.addEventListener('mousedown', (event) => {
+    // Handle drawing the webs
+    if (!onMainScreen && !transitioning) {
+        const x = event.clientX;
+        const y = event.clientY + cameraY;
+
+        if (event.button == 0) { // left click, draw web
+            drawWeb.forceDrawNode(x, y);
+        } else if (event.button == 2) { // right click, move spider
+            drawWeb.dropWebAndForceDrawSpider(x, y);
+        }
+    }
+});
+function updateDrawWebScreen() {
+    // honestly this is all you need to do the drawing code is above
+    drawWeb.update();
+}
+
+function updateTransitionToMainScreen() {
+    spiderWeb.update();
+    if (cameraY > 0) { // camera moving up
+        cameraY -= TRANSITION_SPEED;
+    } else {
+        drawWeb.webSegs = [];
+
+        onMainScreen = true;
+        transitioning = false;
+    }
+}
+
+
 function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Will be important for the transition
+    context.save();
+    context.translate(0, -cameraY);
+
     spiderWeb.drawWeb(context, "lightgray");
+    drawWeb.drawWeb(context, "lightgray");
     
     for (let i = 0; i < flies.length; i++) {
         flies[i].draw(context);
     }
     
     spiderWeb.drawSpider(context);
-}
 
+
+    context.restore();
+}
 
 
 

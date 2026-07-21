@@ -272,6 +272,7 @@ class Spider {
 
 const WEBSAG = 0.001; // Added % length to web to make it sag a bit
 const MIN_WEBLENGTH = 0.1;
+const DRAW_AUTOSNAP_THRESHOLD = 10;
 // rewrite of spiderweb class
 class SpiderWeb {
     constructor(spider) {
@@ -295,6 +296,111 @@ class SpiderWeb {
                 this.spider.y + SIZE/2, this.spider.x + SIZE/2, this.spider.y + SIZE/2, MIN_WEBLENGTH));
         this.attached = true;
         this.spider.walkTo(x, y);
+    }
+
+    // this shits only here to make it so that if im holding a web, the spider drops it where it is and then moves
+    // i make this function late after i did the pathing shit below so its kinda redundant and i could use this and
+    // make that code better but i choose not to. because i am king. king kong.
+    dropWebAndForceSpider(x, y) {
+        this.attached = false;
+        this.forceSpider(x, y);
+    }
+
+    // same as dropWebAndForceSpider, but check if you have a webseg end nearby, and snap to it if we do!
+    dropWebAndForceDrawSpider(x, y) {
+
+        // handle case of nobody drew nothing yet
+        if (this.webSegs.length == 0) {
+            this.forceNode(x, y);
+            return;
+        }
+
+        let closestNodeIndex = -1;
+        let closestNodeDist = Infinity;
+        let startOfSeg = false;
+        for (let i = 0; i < this.webSegs.length; i++) {
+            let distToStartOfSeg = Math.sqrt( (x - this.webSegs[i].x1)**2 + (y - this.webSegs[i].y1)**2 );
+            let distToEndOfSeg = Math.sqrt( (x - this.webSegs[i].x2)**2 + (y - this.webSegs[i].y2)**2 );
+
+            if (distToStartOfSeg <= distToEndOfSeg) {
+                // start is closer (or same, but just choose start)
+                if (distToStartOfSeg < closestNodeDist) {
+                    closestNodeIndex = i;
+                    closestNodeDist = distToStartOfSeg;
+                    startOfSeg = true;
+                }
+
+            } else {
+                // end is closer
+                if (distToEndOfSeg < closestNodeDist) {
+                    closestNodeIndex = i;
+                    closestNodeDist = distToEndOfSeg;
+                    startOfSeg = false;
+                }
+            }
+        }
+
+        if (closestNodeDist < DRAW_AUTOSNAP_THRESHOLD) {
+            // we now have closest point and its close enough
+            if (startOfSeg) {
+                // its at the start of the segment
+                this.dropWebAndForceSpider(this.webSegs[closestNodeIndex].x1, this.webSegs[closestNodeIndex].y1);
+            } else {
+                // its at the end of the segment
+                this.dropWebAndForceSpider(this.webSegs[closestNodeIndex].x2, this.webSegs[closestNodeIndex].y2);
+            }
+        } else {
+            this.dropWebAndForceSpider(x, y);
+        }
+    }
+
+    // same as force node, but check if you have a webseg end nearby, and snap to it if we do!
+    forceDrawNode(x, y) {
+
+        // handle case of nobody drew nothing yet
+        if (this.webSegs.length == 0) {
+            this.forceNode(x, y);
+            return;
+        }
+
+        let closestNodeIndex = -1;
+        let closestNodeDist = Infinity;
+        let startOfSeg = false;
+        for (let i = 0; i < this.webSegs.length; i++) {
+            let distToStartOfSeg = Math.sqrt( (x - this.webSegs[i].x1)**2 + (y - this.webSegs[i].y1)**2 );
+            let distToEndOfSeg = Math.sqrt( (x - this.webSegs[i].x2)**2 + (y - this.webSegs[i].y2)**2 );
+
+            if (distToStartOfSeg <= distToEndOfSeg) {
+                // start is closer (or same, but just choose start)
+                if (distToStartOfSeg < closestNodeDist) {
+                    closestNodeIndex = i;
+                    closestNodeDist = distToStartOfSeg;
+                    startOfSeg = true;
+                }
+
+            } else {
+                // end is closer
+                if (distToEndOfSeg < closestNodeDist) {
+                    closestNodeIndex = i;
+                    closestNodeDist = distToEndOfSeg;
+                    startOfSeg = false;
+                }
+            }
+        }
+
+
+        if (closestNodeDist < DRAW_AUTOSNAP_THRESHOLD) {
+            // we now have closest point and its close enough
+            if (startOfSeg) {
+                // its at the start of the segment
+                this.forceNode(this.webSegs[closestNodeIndex].x1, this.webSegs[closestNodeIndex].y1);
+            } else {
+                // its at the end of the segment
+                this.forceNode(this.webSegs[closestNodeIndex].x2, this.webSegs[closestNodeIndex].y2);
+            }
+        } else {
+            this.forceNode(x, y);
+        }
     }
 
     // move spider to location overwriting everything else
@@ -584,6 +690,7 @@ class Fly {
     }
 
     update(windowW, windowH) {
+
         this.framesInDirection += 1;
 
         // Handle movement stuff

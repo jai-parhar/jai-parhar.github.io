@@ -8,12 +8,14 @@
 
 body {
     font-family: 'VCR OSD Mono';
-    margin-top: 2.5vw;
-    margin-left: 8vw;
-    margin-right: 8vw;
+    
+    margin: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+
     background-color: rgb(0, 0, 0);
     color: white;
-    z-index: 1;
 
     text-shadow:
         -2px  0px 0 #000,
@@ -27,15 +29,53 @@ body {
 }
 
 
+
+#camera {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+
+    will-change: transform;
+    
+    z-index: 1;
+    
+    pointer-events: none;
+}
+
+button {
+    pointer-events: auto;
+}
+
+.screen {
+    width: 100vw;
+    height: 100vh;
+}
+
+#draw-web-screen {
+    position: absolute;
+    top: 150vh;
+    left: 0;
+}
+
+
+
+
+
 #background-canvas {
     position:fixed;
     left:0;
     top:0;
-    z-index:-1;
+    z-index:0;
 }
 
 #foreground {
     min-height: 100vh;
+
+    margin-top: 2.5vw;
+    margin-left: 8vw;
+    margin-right: 8vw;
 
     display: flex;
     justify-content: center;
@@ -66,13 +106,6 @@ body {
     
 }
 
-#footnote {
-    font-size: small;
-    position: fixed;
-    bottom: 0;
-    right: 0; /* Optional: adjust as needed for horizontal positioning */
-    /*width: 100%; /* Optional: adjust as needed */
-}
 
 .content-link {
     width: fit-content;
@@ -80,6 +113,7 @@ body {
 
     margin-top: 2vw;
 
+    font-family: 'VCR OSD Mono';
     font-size: 16px;
 
     text-shadow: none;
@@ -91,8 +125,6 @@ body {
     padding: 0.5vw 0.5vw;
 
     cursor: pointer;
-
-    text-shadow: none;
 }
 
 ::selection {
@@ -124,10 +156,12 @@ body {
     cursor: pointer;
 }
 
+.content-link:hover,
 #feed-spider-button:hover {
     filter: brightness(90%);
 }
 
+.content-link:active,
 #feed-spider-button:active {
     filter: brightness(80%);
 }
@@ -137,4 +171,30 @@ body {
     font-family: 'VCR OSD Mono';
     font-size: 16px;
     color: white;
+}
+
+#go-back {
+    margin-top: 1vw;
+    margin-left: 1vw;
+
+    font-family: 'VCR OSD Mono';
+    font-size: 16px;
+
+    text-shadow: none;
+
+    background-color: #ffffff;
+    color: #000000;
+
+    border: none;
+    padding: 0.5vw 0.5vw;
+
+    cursor: pointer;
+}
+
+#go-back:hover {
+    filter: brightness(90%);
+}
+
+#go-back:active {
+    filter: brightness(80%);
 }
