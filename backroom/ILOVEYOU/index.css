@@ -198,3 +198,29 @@ button {
 #go-back:active {
     filter: brightness(80%);
 }
+
+#draw-web {
+    margin-top: 1vw;
+    margin-left: 1vw;
+
+    font-family: 'VCR OSD Mono';
+    font-size: 16px;
+
+    text-shadow: none;
+
+    background-color: #ffffff;
+    color: #000000;
+
+    border: none;
+    padding: 0.5vw 0.5vw;
+
+    cursor: pointer;
+}
+
+#draw-web:hover {
+    filter: brightness(90%);
+}
+
+#draw-web:active {
+    filter: brightness(80%);
+}
