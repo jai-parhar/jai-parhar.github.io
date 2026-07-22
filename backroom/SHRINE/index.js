@@ -18,15 +18,15 @@ function resizeCanvas() {
 resizeCanvas();
 
 
-let ilovejai_text = gifler("res/ilovejai.gif");
 
-
-
+// let ilovejai_text = new GIF("res/ilovejai.gif");
+// let explosion = new GIF("res/explosion.gif");
 
 
 
 function update() {
-    
+    // ilovejai_text.update();
+    // explosion.update();
 }
 
 
@@ -35,7 +35,8 @@ function update() {
 function draw() {
     overlay_context.clearRect(0, 0, overlay_canvas.width, overlay_canvas.height);
 
-    
+    // ilovejai_text.draw(overlay_context, 100, 100);
+    // explosion.draw(overlay_context, 100, 100);
 
 }
 
@@ -131,3 +132,5 @@ function startAnimating(fps) {
 }
 
 startAnimating(60);
+
+

@@ -58,6 +58,9 @@ body {
 }
 
 #header {
-    font-size: xx-large;
-    text-align: center;
+    display: flex;
+    justify-content: center; /* horizontal centering */
+    align-items: center;     /* vertical centering */
+
+    gap: 1rem;               /* spacing between gifs */
 }
