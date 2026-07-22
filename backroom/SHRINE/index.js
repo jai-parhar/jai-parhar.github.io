@@ -18,7 +18,7 @@ function resizeCanvas() {
 resizeCanvas();
 
 
-let ilovejai_text = gifler("res/ilovejai.gif")
+let ilovejai_text = gifler("res/ilovejai.gif");
 
 
 
