@@ -1,7 +1,5 @@
-let background_canvas = document.getElementById("background-canvas");
 let overlay_canvas = document.getElementById("overlay-canvas")
 
-let background_context = background_canvas.getContext("2d");
 let overlay_context = overlay_canvas.getContext("2d");
 
 let windowW = window.innerWidth;
@@ -20,12 +18,9 @@ function resizeCanvas() {
 resizeCanvas();
 
 
-//const jermaGif = document.getElementById("jerma-gif");
+let ilovejai_text = gifler("res/ilovejai.gif")
 
-// jermaGif.style.left = '0';
-// jermaGif.style.top = '-1vh';
-// jermaGif.style.width = "100vw";
-// jermaGif.style.height = "100vh";
+
 
 
 
