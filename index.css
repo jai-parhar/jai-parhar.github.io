@@ -61,3 +61,23 @@ body {
   background-color: #ffffff; /* Sets the background color of the selection */
   color: #000000; /* Sets the text color within the selection */
 }
+
+@media (max-width: 768px) {
+    body {
+        margin-left: 4vw;
+        margin-right: 4vw;
+    }
+
+    .aboutme-body {
+        flex-direction: column;
+    }
+
+    #header {
+        font-size: x-large;
+    }
+
+    #footnote {
+        position: static;
+        margin-top: 2rem;
+    }
+}
