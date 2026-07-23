@@ -53,10 +53,7 @@ async function initializeFaceDetector() {
 
 
 
-
-
-
-
+const censor_effects = [];
 function draw() {
 
     mirror_context.save();
@@ -89,6 +86,11 @@ function draw() {
 
 
     const faces = face_detector.detectForVideo(webcam,performance.now());
+    while (censor_effects.length < faces.detections.length) { 
+        // add new censor effects to handle
+        // we will add a new element for every time we see multiple faces, but reuse the same index
+        censor_effects.push(new CensorEffect());
+    }
     for (let i = 0; i < faces.detections.length; i++) {
         const box = faces.detections[i].boundingBox;
 
@@ -104,10 +106,9 @@ function draw() {
         // flip the bounding box horizontally to match the webcam image
         mc_x = mirror_canvas.width - mc_x - mc_w;
 
-        mirror_context.strokeStyle = "lime";
-        mirror_context.lineWidth = 4;
-
-        mirror_context.strokeRect(mc_x, mc_y, mc_w, mc_h);
+        censor_effects[i].update({x: mc_x, y: mc_y, w: mc_w, h: mc_h});
+        censor_effects[i].update({x: mc_x, y: mc_y, w: mc_w, h: mc_h}); // draw a little faster
+        censor_effects[i].draw(mirror_context);
     }
     
 
