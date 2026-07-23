@@ -58,6 +58,8 @@ body {
 }
 
 #header {
+    margin-top: 7vw;
+
     display: flex;
     justify-content: center; /* horizontal */
     align-items: center;     /* vertical */
@@ -80,7 +82,33 @@ body {
 }
 
 
+:root {
+    --text-height: 11vh;
+}
 
+.text-gif {
+    height: var(--text-height);
+    width: auto;
+}
+
+.banner {
+    height: var(--text-height);
+    width: auto;
+}
+
+.explosion {
+    height: 25vh;
+    width: auto;
+}
+
+.heart {
+    height: 20vh;
+    width: auto;
+}
+
+.flipped {
+    transform: scaleX(-1);
+}
 
 
 

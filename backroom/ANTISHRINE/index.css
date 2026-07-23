@@ -1,0 +1,235 @@
+.canvas-gif {
+    position: absolute;
+}
+
+
+#overlay-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    z-index: 9999;
+
+    /* Allow clicks to pass through */
+    pointer-events: none;
+}
+
+@font-face {
+    font-family: 'VCR OSD Mono'; /* Give your font a descriptive name */
+    src: url('../../res/VCR_OSD_MONO_1.001.ttf') format('truetype'); /* Specify the path to your .ttf file */
+    font-weight: normal; /* Optional: Define font weight if applicable */
+    font-style: normal; /* Optional: Define font style if applicable */
+    font-display: swap; /* Optional: Controls how the font is displayed while loading */
+}
+
+body {
+    font-family: 'VCR OSD Mono';
+    /* margin-top: 2.5vw; */
+    /* margin-left: 8vw; */
+    /* margin-right: 8vw; */
+    background-color: rgb(0, 0, 0);
+    color: white;
+    z-index: 1;
+    overflow: hidden;
+
+    
+    margin: 0;
+    min-height: 100vh;
+
+    background-image: url("res/sadjermashirtrip.gif");
+    background-repeat: repeat;
+    background-position: top left;
+    background-size: 20%;
+}
+
+#foreground {
+    height: 100vh;
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    flex-direction: column;
+
+    gap: 5vh;
+}
+
+#header {
+    margin-top: 7vw;
+
+    display: flex;
+    justify-content: center; /* horizontal */
+    align-items: center;     /* vertical */
+
+    gap: 1rem;               /* spacing between gifs */
+}
+
+
+
+.image-wrapper {
+    position: relative;
+    height: 100%;
+    flex: 0 0 auto;
+}
+
+.image-wrapper img {
+    display: block;
+    height: 100%;
+    width: auto;
+}
+
+.image-wrapper canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+}
+
+
+
+#images {
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#images > img {
+    height: 100%;
+    width: auto;
+}
+
+
+
+:root {
+    --text-height: 11vh;
+}
+
+.text-gif {
+    height: var(--text-height);
+    width: auto;
+}
+
+.banner {
+    height: var(--text-height);
+    width: auto;
+}
+
+.explosion {
+    height: 25vh;
+    width: auto;
+}
+
+.heart {
+    height: 20vh;
+    width: auto;
+}
+
+.flipped {
+    transform: scaleX(-1);
+}
+
+
+
+
+
+
+:root {
+    --border-width: 7vw;
+}
+
+#screen-border {
+    position: fixed;
+    inset: 0;
+
+    pointer-events: none;
+    z-index: 9998;
+}
+
+#screen-border > div {
+    position: absolute;
+    overflow: hidden;
+
+    image-rendering: pixelated;
+}
+
+
+#border-top,
+#border-bottom {
+    left: 0;
+    width: 100vw;
+    height: var(--border-width);
+
+    background-image: url("res/fire.gif");
+    background-repeat: repeat-x;
+    background-size: var(--border-width) var(--border-width);
+    z-index: 9998;
+}
+
+
+#border-top {
+    top: -1vw;
+    transform: scaleY(-1);
+}
+
+
+#border-bottom {
+    bottom: -1vw;
+}
+
+
+
+#border-left,
+#border-right {
+    top: 0;
+    width: var(--border-width);
+    height: 100vh;
+    z-index: 9997;
+}
+
+
+#border-left {
+    left: -1vw;
+}
+
+
+#border-right {
+    right: -1vw;
+}
+
+#border-left::before,
+#border-right::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 100vh;
+    height: var(--border-width);
+
+    background-image: url("res/fire.gif");
+    background-repeat: repeat-x;
+    background-size: var(--border-width) var(--border-width);
+
+    top: 50%;
+    left: 50%;
+
+    transform-origin: center;
+}
+
+#border-right::before {
+    transform: translate(-50%, -50%) rotate(90deg) scaleY(-1);
+}
+
+#border-left::before {
+    transform: translate(-50%, -50%) rotate(90deg);
+}
