@@ -1,0 +1,30 @@
+body {
+    margin: 0;
+    background: black;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100vw;
+    height: 100vh;
+}
+
+#mirror {
+    width: 90vw;
+    height: 90vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: 20px solid #5f4b32;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+#mirror-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}

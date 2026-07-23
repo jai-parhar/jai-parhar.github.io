@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+    <!-- Homepage --> 
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>A MOMENT OF REFLECTION</title>
+    <link rel="stylesheet" href="index.css">
+	<link rel="icon" type="image/png" href="./res/favicon.png">
+	
+</head>
+<body>
+
+    <div id="mirror">
+        <canvas id="mirror-canvas"></canvas>
+    </div>
+
+
+
+
+    <video id="webcam" autoplay playsinline style="display:none;"></video> <!-- hidden, just to have the id -->
+
+    <!-- opencv.js is real big so probably better to load like this even tho i dont like it :/ -->
+    <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+    <script src="/backroom/NOPHONES.js"></script>
+    <script type="module" src="index.js"></script>
+</body>
+</html>
+
