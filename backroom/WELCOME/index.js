@@ -14,6 +14,13 @@ function resizeCanvas() {
     canvas.height = window.innerHeight;
 }
 
+window.addEventListener("pageshow", function (event) {
+  if (event.persisted) {
+    // Force a complete page refresh
+    window.location.reload(); 
+  }
+});
+
 // Run once at start to get the window to the correct size
 resizeCanvas();
 
@@ -82,11 +89,6 @@ door.addEventListener("click", () => {
     }, 3000);
 });
 
-// reset this page onload
-window.onload = function() {
-    doorClicked = false;   
-    doorHover = false;
-}
 
 function update() {
     // Performs one step of the update
