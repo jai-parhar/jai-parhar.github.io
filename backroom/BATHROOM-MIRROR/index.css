@@ -12,13 +12,12 @@ body {
 
 #mirror {
     width: 90vw;
-    height: 90vh;
+    height: 80vh;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    border: 20px solid #5f4b32;
     box-sizing: border-box;
     overflow: hidden;
 }
