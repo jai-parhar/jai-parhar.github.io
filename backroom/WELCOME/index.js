@@ -17,8 +17,6 @@ function resizeCanvas() {
 // Run once at start to get the window to the correct size
 resizeCanvas();
 
-
-
 // I wanna do like stars with parallax moving down
 // Each index in the following arrays refers to the parallax levels, with 0 being furthest and 2(?) being closest
 const STAR_SIZES = [1, 2, 3];
@@ -83,6 +81,12 @@ door.addEventListener("click", () => {
         window.location.href = "../ILOVEYOU/"; // OH SEND EM AWAY!
     }, 3000);
 });
+
+// reset this page onload
+window.onload = function() {
+    doorClicked = false;   
+    doorHover = false;
+}
 
 function update() {
     // Performs one step of the update
