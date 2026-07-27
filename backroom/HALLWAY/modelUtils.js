@@ -138,6 +138,38 @@ function makeRoomFaces(length, width, height) {
     }
 }
 
+function generateQuadMesh(gl, shader, width, height, positionAttribName="vertex_position", uvAttribName="vertex_uv", normalAttribName="vertex_normal") {
+    let vertex_positions = new Float32Array([
+        -0.5*width, -0.5*height, 0,
+        0.5*width, -0.5*height, 0,
+        0.5*width,  0.5*height, 0,
+
+        -0.5*width, -0.5*height, 0,
+        0.5*width,  0.5*height, 0,
+        -0.5*width,  0.5*height, 0
+    ]);
+    let vertex_uvs = new Float32Array([
+        0,0,
+        1,0,
+        1,1,
+
+        0,0,
+        1,1,
+        0,1
+    ]);
+    let vertex_normals = new Float32Array([
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1
+    ]);
+    let quad_mesh = generateMesh(gl, vertex_positions, vertex_uvs, vertex_normals, shader, positionAttribName, uvAttribName, normalAttribName);
+    return quad_mesh;
+}
+
 function generateRoomMeshes(gl, shader, length, width, height, positionAttribName="vertex_position", uvAttribName="vertex_uv", normalAttribName="vertex_normal") {
     let boxVertexData = makeRoomFaces(length, width, height);
     let frontMesh = generateMesh(gl, boxVertexData.front, boxVertexData.faceUVs, boxVertexData.frontNormals, shader, positionAttribName, uvAttribName, normalAttribName);

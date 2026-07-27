@@ -45,7 +45,7 @@ document.addEventListener("mousemove", (event)=>{
 });
 
 const camera = {
-    position: glMatrix.vec3.fromValues(0, 0, 3),
+    position: glMatrix.vec3.fromValues(0, 0, 45),
     pitch: 0, // polar angle, but set so that 0 is forward
     yaw: 0 // azimuthal angle, but set so that 0 is +z
 };
@@ -123,15 +123,39 @@ function updateCamera() {
 
 
 
-const test_texture = loadTexture(gl, "res/doorclosed_white.png");
+const doorTexture = loadTexture(gl, "res/doorclosed_black.png");
 const roofTexture = generateSolidTexture(gl, [225, 226, 187, 255]);
 const floorTexture = generateSolidTexture(gl, [107, 95, 24, 255]);
 const wallTexture = generateSolidTexture(gl, [228, 230, 168, 255]);
 
 const lights = [];
-lights.push({position: [0, 0, 0], colour: [1.0, 0.95, 0.8], intensity: 6.0});
-lights.push({position: [0, 0, -40], colour: [1.0, 0.95, 0.8], intensity: 6.0});
-lights.push({position: [0, 0, 40], colour: [1.0, 0.95, 0.8], intensity: 6.0});
+lights.push({position: [0, 0, 0], colour: [1.0, 0.95, 0.8], intensity: 10.0});
+lights.push({position: [0, 0, -40], colour: [1.0, 0.95, 0.8], intensity: 10.0});
+lights.push({position: [0, 0, 40], colour: [1.0, 0.95, 0.8], intensity: 10.0});
+
+function createDoor(position, rotation, text, link, scale=1) {
+    let door = {
+        mesh:generateQuadMesh(gl, shaderProgram, (8/14) * 10, 10),
+        model_transform: glMatrix.mat4.create(),
+        text: text, 
+        link: link
+    };
+
+    glMatrix.mat4.translate(door.model_transform, door.model_transform, position);
+
+    glMatrix.mat4.rotateY(door.model_transform, door.model_transform, rotation[0]);
+    glMatrix.mat4.rotateX(door.model_transform, door.model_transform, rotation[1]);
+    glMatrix.mat4.rotateZ(door.model_transform, door.model_transform, rotation[2]);
+
+    glMatrix.mat4.scale(door.model_transform, door.model_transform, [scale, scale, scale]);
+
+    return door;
+}
+
+const doors = [];
+doors.push(createDoor([0, 0, 49.9], [Math.PI, 0, 0], "YOU CAME IN THROUGH HERE", "/backroom/WELCOME"));
+
+
 
 function draw() {
     gl.clearColor(0, 0, 0, 1);
@@ -162,6 +186,12 @@ function draw() {
     drawMesh(gl, room.back, shaderProgram);
     drawMesh(gl, room.left, shaderProgram);
     drawMesh(gl, room.right, shaderProgram);
+
+    setTexture(gl, doorTexture, shaderProgram);
+    for (let i = 0; i < doors.length; i++) {
+        gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, doors[i].model_transform);
+        drawMesh(gl, doors[i].mesh, shaderProgram);
+    }
 
 }
 
