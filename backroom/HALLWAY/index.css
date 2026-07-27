@@ -1,0 +1,75 @@
+@font-face {
+    font-family: 'VCR OSD Mono'; /* Give your font a descriptive name */
+    src: url('../../res/VCR_OSD_MONO_1.001.ttf') format('truetype'); /* Specify the path to your .ttf file */
+    font-weight: normal; /* Optional: Define font weight if applicable */
+    font-style: normal; /* Optional: Define font style if applicable */
+    font-display: swap; /* Optional: Controls how the font is displayed while loading */
+}
+
+body {
+    font-family: 'VCR OSD Mono';
+    background-color: rgb(0, 0, 0);
+    color: white;
+    z-index: 0;
+}
+
+
+#canvas {
+    position:fixed;
+    left:0;
+    top:0;
+    z-index:1000;
+    width: 100vw;
+    height: 100vh;
+}
+
+
+#foreground {
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-direction: column;
+
+    gap: 5vh;
+}
+
+#header {
+    font-size: xx-large;
+    text-align: center;
+}
+
+#links {
+    display: flex;
+    
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    gap: 3vh;
+}
+
+::selection {
+    background-color: #ffffff;
+    color: #000000;
+    
+    text-shadow: none;
+}
+
+.link {
+    background-color: white;
+    color: black;
+    text-decoration: none;
+
+    padding: 0.5vw 0.5vw;
+}
+
+.link:hover {
+    filter: brightness(80%);
+}
+
+.link:active {
+    filter: brightness(90%);
+}

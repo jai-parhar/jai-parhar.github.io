@@ -11,8 +11,8 @@ body {
 }
 
 #mirror {
-    width: 90vw;
-    height: 80vh;
+    width: 60vw;
+    height: 60vh;
 
     display: flex;
     justify-content: center;

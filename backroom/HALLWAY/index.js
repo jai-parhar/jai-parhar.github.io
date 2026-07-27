@@ -1,0 +1,256 @@
+let canvas = document.getElementById("canvas");
+const gl = canvas.getContext("webgl2");
+
+if (!gl) {
+    // Too old browser
+    canvas.remove();
+    document.body.style.overflow = "";
+    throw new Error("WebGL2 is not supported.");
+}
+
+let windowW = window.innerWidth;
+let windowH = window.innerHeight;
+
+// Set background up
+canvas.style.background = "#000000";
+window.addEventListener('resize', resizeCanvas, false); 
+function resizeCanvas() {
+    windowW = window.innerWidth;
+    windowH = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+}
+resizeCanvas(); // Run once at start to get the window to the correct size
+
+const keys = {};
+window.addEventListener("keydown", (event) => {
+    keys[event.code] = true;
+});
+window.addEventListener("keyup", (event) => {
+    keys[event.code] = false;
+});
+
+canvas.addEventListener("click", ()=>{
+    canvas.requestPointerLock();
+});
+
+
+const mouse_sensitivity = 0.002;
+document.addEventListener("mousemove", (event)=>{
+    if(document.pointerLockElement !== canvas) { return; }
+
+    camera.yaw -= event.movementX * mouse_sensitivity;
+    camera.pitch -= event.movementY * mouse_sensitivity;
+});
+
+const camera = {
+    position: glMatrix.vec3.fromValues(0, 0, 3),
+    pitch: 0, // polar angle, but set so that 0 is forward
+    yaw: 0 // azimuthal angle, but set so that 0 is +z
+};
+
+const cameraSpeed = 0.1;
+
+const shaderProgram = await createShaderProgram(gl, "./res/vert.glsl", "./res/frag.glsl");
+
+const vertices = new Float32Array([
+    -0.5,-0.5,0,
+     0.5,-0.5,0,
+     0.5, 0.5,0,
+
+    -0.5,-0.5,0,
+     0.5, 0.5,0,
+    -0.5, 0.5,0
+]);
+
+const uvs = new Float32Array([
+    0,0,
+    1,0,
+    1,1,
+
+    0,0,
+    1,1,
+    0,1
+]);
+
+const quad_mesh = generateTexturedMesh(gl, vertices, uvs, shaderProgram);
+
+const room = generateBoxFaceMeshes(gl, shaderProgram, 100, 10, 10);
+
+const projection = glMatrix.mat4.create();
+const view = glMatrix.mat4.create();
+const model = glMatrix.mat4.create();
+
+glMatrix.mat4.perspective(
+    projection,
+    Math.PI / 3,
+    canvas.width / canvas.height,
+    0.1,
+    100
+);
+glMatrix.mat4.copy(view, getCameraViewMatrix(camera));
+glMatrix.mat4.identity(model);
+
+
+
+function update() {
+
+    updateCamera();
+    glMatrix.mat4.copy(view, getCameraViewMatrix(camera));
+}
+
+function updateCamera() {
+    let forwardVector = flattenY(getCameraForwardVector(camera));
+    let rightVector = flattenY(getCameraRightVector(camera));
+
+    if (keys["KeyW"]) {
+        glMatrix.vec3.scaleAndAdd(camera.position, camera.position, forwardVector, cameraSpeed);
+    }
+
+    if (keys["KeyS"]) {
+        glMatrix.vec3.scaleAndAdd(camera.position, camera.position, forwardVector, -cameraSpeed);
+    }
+
+    if (keys["KeyD"]) {
+        glMatrix.vec3.scaleAndAdd(camera.position, camera.position, rightVector, cameraSpeed);
+    }
+
+    if (keys["KeyA"]) {
+        glMatrix.vec3.scaleAndAdd(camera.position, camera.position, rightVector, -cameraSpeed);
+    }
+}
+
+
+
+const test_texture = loadTexture(gl, "res/doorclosed_white.png");
+const roofTexture = generateSolidTexture(gl, [225, 226, 187, 255]);
+const floorTexture = generateSolidTexture(gl, [107, 95, 24, 255]);
+const wallTexture = generateSolidTexture(gl, [228, 230, 168, 255]);
+
+function draw() {
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    gl.enable(gl.DEPTH_TEST);
+
+    
+    // send matrices
+    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, model);
+    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"view"), false, view);
+    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"projection"), false, projection);
+
+    setTexture(gl, roofTexture, shaderProgram);
+    drawMesh(gl, room.top, shaderProgram);
+
+    setTexture(gl, floorTexture, shaderProgram);
+    drawMesh(gl, room.bottom, shaderProgram);
+
+    setTexture(gl, wallTexture, shaderProgram);
+    drawMesh(gl, room.front, shaderProgram);
+    drawMesh(gl, room.back, shaderProgram);
+    drawMesh(gl, room.left, shaderProgram);
+    drawMesh(gl, room.right, shaderProgram);
+
+}
+
+
+
+
+
+
+function updateFrame(timestamp) {
+
+    // calc elapsed time since last loop
+
+    now = Date.now();
+    elapsed = now - then;
+
+    // if enough time has elapsed, draw the next frame
+
+    if (elapsed > fpsInterval) {
+
+        // Get ready for next frame by setting then=now, but also adjust for your
+        // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
+        then = now - (elapsed % fpsInterval);
+
+        // Perform update
+        update();
+    
+        frameCount += 1;
+        
+        // Draw screen
+        draw();
+
+    }
+
+    // Request next frame
+    requestAnimationFrame(updateFrame);
+}
+
+
+// my sweet danieltones
+let audioCtx = null;
+let oscillator = null;
+function startTone(frequency = 440) {
+
+    // If you dont have a context make one I love you!
+    if (!audioCtx) {
+        audioCtx = new window.AudioContext();
+    }
+
+    // FIREFOX SUCK MY DICK
+    // LET ME DO WHATEVER I WANT FUCKER
+    if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+    }
+
+    // YOU ALREADY GOT ONE
+    if (oscillator) return;
+
+    oscillator = audioCtx.createOscillator();
+
+    // Params bro. It's all params
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        audioCtx.currentTime
+    );
+
+    // SENDEROFF
+    oscillator.connect(audioCtx.destination);
+    oscillator.start();
+}
+
+
+// SHUT THE FUCK
+function stopTone() {
+    if (oscillator) {
+        oscillator.stop();
+        oscillator.disconnect();
+        oscillator = null;
+    }
+}
+
+// okay yeah actually gotta do the animation stuff now wonderful
+let stop = false;
+let frameCount = 0;
+let fps, fpsInterval, startTime, now, then, elapsed;
+
+// initialize the timer variables and start the animation
+function startAnimating(fps) {
+    fpsInterval = 1000 / fps;
+    then = Date.now();
+    startTime = then;
+    updateFrame();
+}
+
+startAnimating(60);
+
+
+
+
+
+
+
+
