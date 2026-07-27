@@ -74,9 +74,9 @@ const uvs = new Float32Array([
     0,1
 ]);
 
-const quad_mesh = generateTexturedMesh(gl, vertices, uvs, shaderProgram);
+const quad_mesh = generatePositionUVMesh(gl, vertices, uvs, shaderProgram);
 
-const room = generateBoxFaceMeshes(gl, shaderProgram, 100, 10, 10);
+const room = generateRoomMeshes(gl, shaderProgram, 100, 10, 10);
 
 const projection = glMatrix.mat4.create();
 const view = glMatrix.mat4.create();
@@ -128,17 +128,28 @@ const roofTexture = generateSolidTexture(gl, [225, 226, 187, 255]);
 const floorTexture = generateSolidTexture(gl, [107, 95, 24, 255]);
 const wallTexture = generateSolidTexture(gl, [228, 230, 168, 255]);
 
+const lights = [];
+lights.push({position: [0, 0, 0], colour: [1.0, 0.95, 0.8], intensity: 6.0});
+lights.push({position: [0, 0, -40], colour: [1.0, 0.95, 0.8], intensity: 6.0});
+lights.push({position: [0, 0, 40], colour: [1.0, 0.95, 0.8], intensity: 6.0});
+
 function draw() {
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.enable(gl.DEPTH_TEST);
 
-    
-    // send matrices
+    // transform matrices
     gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, model);
     gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"view"), false, view);
     gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"projection"), false, projection);
+
+    // lighting uniforms
+    gl.uniform1i(gl.getUniformLocation(shaderProgram, "num_lights"), lights.length);
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "light_position"), lights.flatMap(l => l.position));
+    gl.uniform3fv(gl.getUniformLocation(shaderProgram, "light_colour"), lights.flatMap(l => l.colour));
+    gl.uniform1fv(gl.getUniformLocation(shaderProgram, "light_intensity"), lights.flatMap(l => l.intensity));
+
 
     setTexture(gl, roofTexture, shaderProgram);
     drawMesh(gl, room.top, shaderProgram);
