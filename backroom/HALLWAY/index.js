@@ -123,15 +123,15 @@ function updateCamera() {
 
 
 
-const doorTexture = loadTexture(gl, "res/doorclosed_black.png");
+const doorTexture = loadTexture(gl, "res/doorclosed_white.png");
 const roofTexture = generateSolidTexture(gl, [225, 226, 187, 255]);
 const floorTexture = generateSolidTexture(gl, [107, 95, 24, 255]);
 const wallTexture = generateSolidTexture(gl, [228, 230, 168, 255]);
 
 const lights = [];
-lights.push({position: [0, 0, 0], colour: [1.0, 0.95, 0.8], intensity: 10.0});
-lights.push({position: [0, 0, -40], colour: [1.0, 0.95, 0.8], intensity: 10.0});
-lights.push({position: [0, 0, 40], colour: [1.0, 0.95, 0.8], intensity: 10.0});
+lights.push({position: [0, 0, 0], colour: [1.0, 0.95, 0.8], intensity: 6.0});
+lights.push({position: [0, 0, -40], colour: [1.0, 0.95, 0.8], intensity: 6.0});
+lights.push({position: [0, 0, 40], colour: [1.0, 0.95, 0.8], intensity: 6.0});
 
 function createDoor(position, rotation, text, link, scale=1) {
     let door = {
@@ -153,8 +153,10 @@ function createDoor(position, rotation, text, link, scale=1) {
 }
 
 const doors = [];
-doors.push(createDoor([0, 0, 49.9], [Math.PI, 0, 0], "YOU CAME IN THROUGH HERE", "/backroom/WELCOME"));
-
+doors.push(createDoor([0, -1, 49.9], [Math.PI, 0, 0], "YOU CAME IN THROUGH HERE", "/backroom/WELCOME", 0.8));
+doors.push(createDoor([4.99, -1, 30], [-Math.PI/2, 0, 0], "HOW IT FEELS TO BE JAI", "/backroom/SHRINE", 0.8));
+doors.push(createDoor([-4.99, -1, 30], [Math.PI/2, 0, 0], "HOW IT FEELS TO BE JAI ALSO", "/backroom/ANTISHRINE", 0.8));
+doors.push(createDoor([-4.99, -1, 10], [Math.PI/2, 0, 0], "A QUIET MOMENT OF REFLECTION", "/backroom/BATHROOM-MIRROR", 0.8));
 
 
 function draw() {
