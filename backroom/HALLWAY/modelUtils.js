@@ -364,6 +364,7 @@ function loadTexture(gl, path){
     const image = new Image();
     image.onload = () => {
         gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texImage2D(
             gl.TEXTURE_2D,
             0,
@@ -376,6 +377,9 @@ function loadTexture(gl, path){
         // nearest neighbour textures if texture is scaled up/down
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     };
 
     // load image
@@ -401,6 +405,9 @@ function generateSolidTexture(gl, colour = [255, 0, 255, 255]) {
         gl.UNSIGNED_BYTE,
         new Uint8Array([colour[0], colour[1], colour[2], colour[3]]) 
     );
+
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
     return texture;
 }
