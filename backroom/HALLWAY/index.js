@@ -47,7 +47,8 @@ document.addEventListener("mousemove", (event)=>{
 const camera = {
     position: glMatrix.vec3.fromValues(0, 0, 45),
     pitch: 0, // polar angle, but set so that 0 is forward
-    yaw: 0 // azimuthal angle, but set so that 0 is +z
+    yaw: 0, // azimuthal angle, but set so that 0 is +z
+    projection: glMatrix.mat4.create()
 };
 
 const cameraSpeed = 0.1;
@@ -78,18 +79,19 @@ const quad_mesh = generatePositionUVMesh(gl, vertices, uvs, shaderProgram);
 
 const room = generateRoomMeshes(gl, shaderProgram, 100, 10, 10);
 
-const projection = glMatrix.mat4.create();
-const view = glMatrix.mat4.create();
-const model = glMatrix.mat4.create();
 
 glMatrix.mat4.perspective(
-    projection,
+    camera.projection,
     Math.PI / 3,
     canvas.width / canvas.height,
     0.1,
     100
 );
-glMatrix.mat4.copy(view, getCameraViewMatrix(camera));
+
+
+
+
+const model = glMatrix.mat4.create();
 glMatrix.mat4.identity(model);
 
 
@@ -97,7 +99,6 @@ glMatrix.mat4.identity(model);
 function update() {
 
     updateCamera();
-    glMatrix.mat4.copy(view, getCameraViewMatrix(camera));
 }
 
 function updateCamera() {
@@ -167,8 +168,8 @@ function draw() {
 
     // transform matrices
     gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, model);
-    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"view"), false, view);
-    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"projection"), false, projection);
+    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"view"), false, getCameraViewMatrix(camera));
+    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"projection"), false, camera.projection);
 
     // lighting uniforms
     gl.uniform1i(gl.getUniformLocation(shaderProgram, "num_lights"), lights.length);
