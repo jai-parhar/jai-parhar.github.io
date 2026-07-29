@@ -79,25 +79,6 @@ function makeRoomFaces(length, width, height) {
         0, -1, 0
     ]);
 
-    let rightFaceVertices = new Float32Array([
-        0.5*width, -0.5*height, -0.5*length,
-        0.5*width,  0.5*height, -0.5*length,
-        0.5*width,  0.5*height,  0.5*length,
-
-        0.5*width, -0.5*height, -0.5*length,
-        0.5*width,  0.5*height,  0.5*length,
-        0.5*width, -0.5*height,  0.5*length
-    ]);
-    let rightFaceNormals = new Float32Array([
-        -1, 0, 0,
-        -1, 0, 0,
-        -1, 0, 0,
-
-        -1, 0, 0,
-        -1, 0, 0,
-        -1, 0, 0
-    ]);
-
     let leftFaceVertices = new Float32Array([
         -0.5*width, -0.5*height, -0.5*length,
         -0.5*width,  0.5*height, -0.5*length,
@@ -115,6 +96,25 @@ function makeRoomFaces(length, width, height) {
         1, 0, 0,
         1, 0, 0,
         1, 0, 0
+    ]);
+
+    let rightFaceVertices = new Float32Array([
+        0.5*width, -0.5*height, -0.5*length,
+        0.5*width,  0.5*height, -0.5*length,
+        0.5*width,  0.5*height,  0.5*length,
+
+        0.5*width, -0.5*height, -0.5*length,
+        0.5*width,  0.5*height,  0.5*length,
+        0.5*width, -0.5*height,  0.5*length
+    ]);
+    let rightFaceNormals = new Float32Array([
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0
     ]);
 
     let uvs = new Float32Array([
@@ -136,6 +136,158 @@ function makeRoomFaces(length, width, height) {
         leftNormals: leftFaceNormals, rightNormals: rightFaceNormals, 
         faceUVs: uvs
     }
+}
+
+function generateBoxMesh(gl, shader, length, width, height, positionAttribName="vertex_position", uvAttribName="vertex_uv", normalAttribName="vertex_normal") {
+    const positions = new Float32Array([
+        // back face
+        -0.5*width, -0.5*height, -0.5*length,
+        0.5*width, -0.5*height, -0.5*length,
+        0.5*width,  0.5*height, -0.5*length,
+        -0.5*width, -0.5*height, -0.5*length,
+        0.5*width,  0.5*height, -0.5*length,
+        -0.5*width,  0.5*height, -0.5*length,
+
+        // front face
+        -0.5*width, -0.5*height, 0.5*length,
+        0.5*width, -0.5*height, 0.5*length,
+        0.5*width,  0.5*height, 0.5*length,
+        -0.5*width, -0.5*height, 0.5*length,
+        0.5*width,  0.5*height, 0.5*length,
+        -0.5*width,  0.5*height, 0.5*length,
+
+        // bottom face
+        -0.5*width, -0.5*height, -0.5*length,
+        0.5*width, -0.5*height, -0.5*length,
+        0.5*width, -0.5*height, 0.5*length,
+        -0.5*width, -0.5*height, -0.5*length,
+        0.5*width, -0.5*height,  0.5*length,
+        -0.5*width, -0.5*height,  0.5*length,
+
+        // top face
+        -0.5*width, 0.5*height, -0.5*length,
+        0.5*width, 0.5*height, -0.5*length,
+        0.5*width, 0.5*height, 0.5*length,
+        -0.5*width, 0.5*height, -0.5*length,
+        0.5*width, 0.5*height,  0.5*length,
+        -0.5*width, 0.5*height,  0.5*length,
+
+        // left face
+        -0.5*width, -0.5*height, -0.5*length,
+        -0.5*width,  0.5*height, -0.5*length,
+        -0.5*width,  0.5*height,  0.5*length,
+        -0.5*width, -0.5*height, -0.5*length,
+        -0.5*width,  0.5*height,  0.5*length,
+        -0.5*width, -0.5*height,  0.5*length,
+
+        // right face
+        0.5*width, -0.5*height, -0.5*length,
+        0.5*width,  0.5*height, -0.5*length,
+        0.5*width,  0.5*height,  0.5*length,
+        0.5*width, -0.5*height, -0.5*length,
+        0.5*width,  0.5*height,  0.5*length,
+        0.5*width, -0.5*height,  0.5*length
+    ]);
+    const normals = new Float32Array([
+        // back
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+
+        // front
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+
+        // bottom
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+
+        // top
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+
+        // left
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+
+        // right
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0
+    ]);
+    const uvs = new Float32Array([
+        // back
+        0,0,
+        1,0,
+        1,1,
+        0,0,
+        1,1,
+        0,1,
+
+        // front
+        0,0,
+        1,0,
+        1,1,
+        0,0,
+        1,1,
+        0,1,
+
+        // bottom
+        0,0,
+        1,0,
+        1,1,
+        0,0,
+        1,1,
+        0,1,
+
+        // top
+        0,0,
+        1,0,
+        1,1,
+        0,0,
+        1,1,
+        0,1,
+
+        // left
+        0,0,
+        1,0,
+        1,1,
+        0,0,
+        1,1,
+        0,1,
+
+        // right
+        0,0,
+        1,0,
+        1,1,
+        0,0,
+        1,1,
+        0,1
+    ]);
+    let boxMesh = generateMesh(gl, positions, uvs, normals, shader, positionAttribName, uvAttribName, normalAttribName);
+    return boxMesh;
 }
 
 function generateQuadMesh(gl, shader, width, height, positionAttribName="vertex_position", uvAttribName="vertex_uv", normalAttribName="vertex_normal") {
@@ -317,7 +469,6 @@ function generateMesh(gl, vertex_positions, vertex_uvs, vertex_normals, shader, 
         0
     );
 
-
     gl.bindVertexArray(null);
 
     return {
@@ -332,10 +483,10 @@ function generateMesh(gl, vertex_positions, vertex_uvs, vertex_normals, shader, 
 function drawMesh(gl, mesh, shader) {
     gl.useProgram(shader);
     gl.bindVertexArray(mesh.vao);
+
     gl.drawArrays(gl.TRIANGLES, 0, mesh.vertexCount);
     gl.bindVertexArray(null);
 }
-
 
 
 

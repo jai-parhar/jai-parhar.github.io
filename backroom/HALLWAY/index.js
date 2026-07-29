@@ -77,7 +77,12 @@ const uvs = new Float32Array([
 
 const quad_mesh = generatePositionUVMesh(gl, vertices, uvs, shaderProgram);
 
+
 const room = generateRoomMeshes(gl, shaderProgram, 100, 10, 10);
+const smallcube_mesh = generateBoxMesh(gl, shaderProgram, 0.5, 0.5, 0.5);
+const smallcube_model = glMatrix.mat4.create();
+glMatrix.mat4.identity(smallcube_model);
+const smallcube_texture = generateSolidTexture(gl, [0, 255, 0, 255]);
 
 
 glMatrix.mat4.perspective(
@@ -97,6 +102,22 @@ glMatrix.mat4.identity(model);
 
 
 function update() {
+
+    let door_lookedat = false;
+    for (let i = 0; i < doors.length; i++) {
+        let raycast_result = rayMeshIntersection(getCameraRay(camera), doors[i].mesh, doors[i].model_transform);
+        door_lookedat = door_lookedat || raycast_result.intersection;
+        if (raycast_result.intersection) {
+            glMatrix.mat4.translate(smallcube_model, glMatrix.mat4.identity(smallcube_model), raycast_result.intersections_data[0].point);
+        }
+    }
+    for (let l = 0; l < lights.length; l++) {
+        if (door_lookedat) {
+            lights[l].colour = [1.0, 0, 0];
+        } else {
+            lights[l].colour = [1.0, 0.95, 0.8];
+        }    
+    }
 
     updateCamera();
 }
@@ -161,6 +182,8 @@ doors.push(createDoor([-4.99, -1, 10], [Math.PI/2, 0, 0], "A QUIET MOMENT OF REF
 
 
 function draw() {
+    gl.bindVertexArray(null);
+
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -195,6 +218,10 @@ function draw() {
         gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, doors[i].model_transform);
         drawMesh(gl, doors[i].mesh, shaderProgram);
     }
+
+    setTexture(gl, smallcube_texture, shaderProgram);
+    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, smallcube_model);
+    drawMesh(gl, smallcube_mesh, shaderProgram);
 
 }
 

@@ -99,7 +99,7 @@ function rayTriIntersection(ray, v0, v1, v2) {
 
     // a is v0, b is v1, c is v2
     const s = glMatrix.vec3.create();
-    glMatrix.subtract(s, ray.origin, v0);
+    glMatrix.vec3.subtract(s, ray.origin, v0);
     let u = inv_det * glMatrix.vec3.dot(s, ray_cross_e2);
 
     if (u < -EPSILON || u - 1 > EPSILON) {
@@ -151,7 +151,7 @@ function rayMeshIntersection(ray, mesh, model_transform) {
         let intersection_data = rayTriIntersection(
             ray, 
             glMatrix.vec3.fromValues(world_v0[0], world_v0[1], world_v0[2]),
-            glMatrix.vec3.fromValues(world_v1[0], world_v1[1], world_v2[2]),
+            glMatrix.vec3.fromValues(world_v1[0], world_v1[1], world_v1[2]),
             glMatrix.vec3.fromValues(world_v2[0], world_v2[1], world_v2[2])
         );
 
