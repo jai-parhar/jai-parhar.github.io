@@ -58,6 +58,9 @@ document.addEventListener("mousemove", (event)=>{
     camera.yaw -= event.movementX * mouse_sensitivity;
     camera.pitch -= event.movementY * mouse_sensitivity;
 });
+let mouse_clicked = false;
+document.addEventListener("mousedown", ()=> { mouse_clicked = true; });
+document.addEventListener("mouseup", ()=> { mouse_clicked = false; });
 
 
 const shaderProgram = await createShaderProgram(gl, "./res/vert.glsl", "./res/frag.glsl");
@@ -91,8 +94,19 @@ function update() {
 
     if (looking_at_door) {
         setInfoMessageText(doors[door_index].text);
+        if (mouse_clicked) {
+            window.location.href = doors[door_index].link;
+        }
     } else {
-        setInfoMessageText("");
+        let raycast_result = rayMeshIntersection(getCameraRay(camera), spiderWeb.mesh, spiderWeb.model_transform);
+        if (raycast_result.intersection) {
+            setInfoMessageText(spiderWeb.text);
+            if (mouse_clicked) {
+                window.location.href = spiderWeb.link;
+            }
+        } else {
+            setInfoMessageText("");
+        }
     }
 
 
@@ -126,6 +140,12 @@ function updateCamera() {
     if (keys["KeyA"]) {
         glMatrix.vec3.scaleAndAdd(camera.position, camera.position, rightVector, -cameraSpeed);
     }
+
+    // fuck it im doing collision like this
+    if (camera.position[2] > 49.5) { camera.position[2] = 49.5; }
+    if (camera.position[2] < -49.5) { camera.position[2] = -49.5; }
+    if (camera.position[0] > 4.5) { camera.position[0] = 4.5; }
+    if (camera.position[0] < -4.5) { camera.position[0] = -4.5; }
 }
 
 
@@ -143,7 +163,9 @@ lights.push({position: [0, 0, 40], colour: [1.0, 0.95, 0.8], intensity: 6.0});
 function createDoor(position, rotation, text, link, scale=1) {
     let door = {
         mesh:generateQuadMesh(gl, shaderProgram, (8/14) * 10, 10),
+        doorback_mesh: generateQuadMesh(gl, shaderProgram, (8/14) * 10, 10),
         model_transform: glMatrix.mat4.create(),
+        doorback_model_transform: glMatrix.mat4.create(),
         text: text, 
         link: link
     };
@@ -156,6 +178,8 @@ function createDoor(position, rotation, text, link, scale=1) {
 
     glMatrix.mat4.scale(door.model_transform, door.model_transform, [scale, scale, scale]);
 
+    glMatrix.mat4.copy(door.doorback_model_transform, door.model_transform);
+
     return door;
 }
 
@@ -164,6 +188,20 @@ doors.push(createDoor([0, -1, 49.9], [Math.PI, 0, 0], "YOU CAME IN THROUGH HERE"
 doors.push(createDoor([4.99, -1, 30], [-Math.PI/2, 0, 0], "HOW IT FEELS TO BE JAI", "/backroom/SHRINE", 0.8));
 doors.push(createDoor([-4.99, -1, 30], [Math.PI/2, 0, 0], "HOW IT FEELS TO BE JAI ALSO", "/backroom/ANTISHRINE", 0.8));
 doors.push(createDoor([-4.99, -1, 10], [Math.PI/2, 0, 0], "A QUIET MOMENT OF REFLECTION", "/backroom/BATHROOM-MIRROR", 0.8));
+
+
+const spiderWebTexture = loadTexture(gl, "res/spiderweb.png");
+let spiderWeb = {
+    mesh:generateQuadMesh(gl, shaderProgram, 3, 3),
+    model_transform: glMatrix.mat4.create(),
+    text: "BIG WORLD, SMALL SPIDER", 
+    link: "/backroom/ILOVEYOU"
+};
+
+glMatrix.mat4.translate(spiderWeb.model_transform, spiderWeb.model_transform, [4, 4, 34]);
+glMatrix.mat4.rotateY(spiderWeb.model_transform, spiderWeb.model_transform, -Math.PI/2);
+//glMatrix.mat4.rotateZ(spiderWeb.model_transform, spiderWeb.model_transform, -Math.PI/4);
+glMatrix.mat4.rotateX(spiderWeb.model_transform, spiderWeb.model_transform, Math.PI/4);
 
 
 function draw() {
@@ -205,6 +243,10 @@ function draw() {
         gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, doors[i].model_transform);
         drawMesh(gl, doors[i].mesh, shaderProgram);
     }
+
+    setTexture(gl, spiderWebTexture, shaderProgram);
+    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, spiderWeb.model_transform);
+    drawMesh(gl, spiderWeb.mesh, shaderProgram);
 
 }
 

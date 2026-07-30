@@ -20,6 +20,8 @@ out vec4 out_colour;
 
 void main()
 {
+    if (texture(texture_sampler, uv).a < 0.1) discard;
+
     vec3 normal = normalize(world_normal);
 
     vec3 tex = texture(texture_sampler, uv).rgb;
@@ -34,7 +36,7 @@ void main()
 
         vec3 light_dir = normalize(light_position[i] - world_position);
 
-        float diffuse = max(dot(normal, light_dir), 0.0);
+        float diffuse = max(abs(dot(normal, light_dir)), 0.0);
 
         float distance = length(light_position[i] - world_position);
 

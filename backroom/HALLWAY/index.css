@@ -53,8 +53,8 @@ body {
     left: 50%;
     top: 10%;
     transform: translate(-50%, 5%);
-    background-color: #000000;
-    color:#ffffff;
+    color: #000000;
+    background-color:#ffffff;
     font-size: 3vh;
     white-space: pre-wrap;
 }

@@ -2,6 +2,12 @@
 // FOR THOSE WITH THE EYES TO SEE AND THE EARS TO HEAR
 const FTS_script = [
     {
+        text: "",
+        type_ms_per_char: 1,
+        delete_ms_per_char: 1,
+        wait_ms: 1500
+    },
+    {
         text: "HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
         type_ms_per_char: 40,
         delete_ms_per_char: 5,
