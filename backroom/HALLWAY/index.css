@@ -23,6 +23,53 @@ body {
     height: 100vh;
 }
 
+#HUD {
+    z-index: 1001;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+}
+
+#crosshair {
+    position: absolute;
+    width: 1.5vw;
+    height:auto;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    filter:
+        drop-shadow(1px 0px 0px black)
+        drop-shadow(-1px 0px 0px black)
+        drop-shadow(0px 1px 0px black)
+        drop-shadow(0px -1px 0px black);
+}
+
+#fromthescreen-message {
+    position: absolute;
+    left: 50%;
+    top: 10%;
+    transform: translate(-50%, 5%);
+    background-color: #000000;
+    color:#ffffff;
+    font-size: 3vh;
+    white-space: pre-wrap;
+}
+
+#info-message {
+    position: absolute;
+    left: 50%;
+    bottom: 10%;
+    transform: translate(-50%, -5%);
+    background-color: #000000;
+    color:#ffffff;
+    font-size: 3vh;
+    white-space: pre-wrap;
+}
+
 
 #foreground {
     min-height: 100vh;

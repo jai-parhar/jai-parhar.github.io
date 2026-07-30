@@ -6,6 +6,8 @@ if (!gl) {
     canvas.remove();
     document.body.style.overflow = "";
     throw new Error("WebGL2 is not supported.");
+} else {
+    document.getElementById("HUD").style.display = "";
 }
 
 let windowW = window.innerWidth;
@@ -36,55 +38,13 @@ canvas.addEventListener("click", ()=>{
 });
 
 
-const mouse_sensitivity = 0.002;
-document.addEventListener("mousemove", (event)=>{
-    if(document.pointerLockElement !== canvas) { return; }
-
-    camera.yaw -= event.movementX * mouse_sensitivity;
-    camera.pitch -= event.movementY * mouse_sensitivity;
-});
-
+const cameraSpeed = 0.1;
 const camera = {
     position: glMatrix.vec3.fromValues(0, 0, 45),
     pitch: 0, // polar angle, but set so that 0 is forward
     yaw: 0, // azimuthal angle, but set so that 0 is +z
     projection: glMatrix.mat4.create()
 };
-
-const cameraSpeed = 0.1;
-
-const shaderProgram = await createShaderProgram(gl, "./res/vert.glsl", "./res/frag.glsl");
-
-const vertices = new Float32Array([
-    -0.5,-0.5,0,
-     0.5,-0.5,0,
-     0.5, 0.5,0,
-
-    -0.5,-0.5,0,
-     0.5, 0.5,0,
-    -0.5, 0.5,0
-]);
-
-const uvs = new Float32Array([
-    0,0,
-    1,0,
-    1,1,
-
-    0,0,
-    1,1,
-    0,1
-]);
-
-const quad_mesh = generatePositionUVMesh(gl, vertices, uvs, shaderProgram);
-
-
-const room = generateRoomMeshes(gl, shaderProgram, 100, 10, 10);
-const smallcube_mesh = generateBoxMesh(gl, shaderProgram, 0.5, 0.5, 0.5);
-const smallcube_model = glMatrix.mat4.create();
-glMatrix.mat4.identity(smallcube_model);
-const smallcube_texture = generateSolidTexture(gl, [0, 255, 0, 255]);
-
-
 glMatrix.mat4.perspective(
     camera.projection,
     Math.PI / 3,
@@ -92,28 +52,53 @@ glMatrix.mat4.perspective(
     0.1,
     100
 );
+const mouse_sensitivity = 0.002;
+document.addEventListener("mousemove", (event)=>{
+    if(document.pointerLockElement !== canvas) { return; }
+    camera.yaw -= event.movementX * mouse_sensitivity;
+    camera.pitch -= event.movementY * mouse_sensitivity;
+});
+
+
+const shaderProgram = await createShaderProgram(gl, "./res/vert.glsl", "./res/frag.glsl");
 
 
 
 
-const model = glMatrix.mat4.create();
-glMatrix.mat4.identity(model);
+const room = generateRoomMeshes(gl, shaderProgram, 100, 10, 10);
 
 
+
+
+
+
+const identity = glMatrix.mat4.create();
+glMatrix.mat4.identity(identity);
+
+let looking_at_door = false;
+let door_index = -1;
 
 function update() {
 
-    let door_lookedat = false;
+    looking_at_door = false;
     for (let i = 0; i < doors.length; i++) {
         let raycast_result = rayMeshIntersection(getCameraRay(camera), doors[i].mesh, doors[i].model_transform);
-        door_lookedat = door_lookedat || raycast_result.intersection;
         if (raycast_result.intersection) {
-            glMatrix.mat4.translate(smallcube_model, glMatrix.mat4.identity(smallcube_model), raycast_result.intersections_data[0].point);
+            looking_at_door = true;
+            door_index = i;
         }
     }
+
+    if (looking_at_door) {
+        setInfoMessageText(doors[door_index].text);
+    } else {
+        setInfoMessageText("");
+    }
+
+
     for (let l = 0; l < lights.length; l++) {
-        if (door_lookedat) {
-            lights[l].colour = [1.0, 0, 0];
+        if (looking_at_door) {
+            lights[l].colour = [1.0, 0.65, 0.5];
         } else {
             lights[l].colour = [1.0, 0.95, 0.8];
         }    
@@ -189,18 +174,20 @@ function draw() {
 
     gl.enable(gl.DEPTH_TEST);
 
-    // transform matrices
-    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, model);
-    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"view"), false, getCameraViewMatrix(camera));
-    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"projection"), false, camera.projection);
-
     // lighting uniforms
     gl.uniform1i(gl.getUniformLocation(shaderProgram, "num_lights"), lights.length);
     gl.uniform3fv(gl.getUniformLocation(shaderProgram, "light_position"), lights.flatMap(l => l.position));
     gl.uniform3fv(gl.getUniformLocation(shaderProgram, "light_colour"), lights.flatMap(l => l.colour));
     gl.uniform1fv(gl.getUniformLocation(shaderProgram, "light_intensity"), lights.flatMap(l => l.intensity));
 
+    // camera transform matrices
+    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"view"), false, getCameraViewMatrix(camera));
+    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"projection"), false, camera.projection);
 
+
+    // model transform matrix default set, no transformation. room doesn't need any transform so its fine.
+    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, identity);
+    
     setTexture(gl, roofTexture, shaderProgram);
     drawMesh(gl, room.top, shaderProgram);
 
@@ -218,10 +205,6 @@ function draw() {
         gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, doors[i].model_transform);
         drawMesh(gl, doors[i].mesh, shaderProgram);
     }
-
-    setTexture(gl, smallcube_texture, shaderProgram);
-    gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, smallcube_model);
-    drawMesh(gl, smallcube_mesh, shaderProgram);
 
 }
 

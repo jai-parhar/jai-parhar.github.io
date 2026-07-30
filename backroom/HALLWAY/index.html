@@ -16,6 +16,11 @@
 <body style="overflow: hidden;">
 
     <canvas id="canvas"></canvas>
+    <div id="HUD" style="display: none;">
+        <div id="fromthescreen-message"></div>
+        <img id="crosshair" src="res/crosshairs.png">
+        <div id="info-message"></div>
+    </div>
     <div id="foreground">
         <div id="header">
             WHAT BROWSER ARE YOU EVEN USING </br>
@@ -35,6 +40,8 @@
     <script src="shaderUtils.js"></script>
     <script src="modelUtils.js"></script>
     <script src="cameraUtils.js"></script>
+    <script src="messagesFromTheScreen.js"></script>
+    <script src="infoMessage.js"></script>
     <script type="module" src="index.js"></script>
 </body>
 </html>
