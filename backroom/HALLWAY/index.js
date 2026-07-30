@@ -96,13 +96,13 @@ function update() {
     }
 
 
-    for (let l = 0; l < lights.length; l++) {
-        if (looking_at_door) {
-            lights[l].colour = [1.0, 0.65, 0.5];
-        } else {
-            lights[l].colour = [1.0, 0.95, 0.8];
-        }    
-    }
+    // for (let l = 0; l < lights.length; l++) {
+    //     if (looking_at_door) {
+    //         lights[l].colour = [1.0, 0.65, 0.5];
+    //     } else {
+    //         lights[l].colour = [1.0, 0.95, 0.8];
+    //     }    
+    // }
 
     updateCamera();
 }

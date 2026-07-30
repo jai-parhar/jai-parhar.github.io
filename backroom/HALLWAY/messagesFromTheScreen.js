@@ -20,7 +20,25 @@ const FTS_script = [
         wait_ms: 3000
     },
     {
-        text: "BUT TAKE A LOAD OFF. RELAX. ENJOY.",
+        text: "THIS WILL ALWAYS BE A WORK IN PROGRESS",
+        type_ms_per_char: 60,
+        delete_ms_per_char: 20,
+        wait_ms: 3000
+    },
+    {
+        text: "AND ONE DAY THIS WILL ALL WORK",
+        type_ms_per_char: 60,
+        delete_ms_per_char: 20,
+        wait_ms: 3000
+    },
+    {
+        text: "I HOPE",
+        type_ms_per_char: 300,
+        delete_ms_per_char: 20,
+        wait_ms: 2000
+    },
+    {
+        text: "BUT FOR NOW. TAKE A LOAD OFF. RELAX. ENJOY.",
         type_ms_per_char: 60,
         delete_ms_per_char: 20,
         wait_ms: 3000
