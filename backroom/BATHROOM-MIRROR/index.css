@@ -6,22 +6,6 @@
     font-display: swap; /* Optional: Controls how the font is displayed while loading */
 }
 
-@font-face {
-    font-family: 'a Another Tag'; /* Give your font a descriptive name */
-    src: url('res/aAnotherTag.ttf') format('truetype'); /* Specify the path to your .ttf file */
-    font-weight: normal; /* Optional: Define font weight if applicable */
-    font-style: normal; /* Optional: Define font style if applicable */
-    font-display: swap; /* Optional: Controls how the font is displayed while loading */
-}
-
-@font-face {
-    font-family: 'Most Wasted'; /* Give your font a descriptive name */
-    src: url('res/Mostwasted.ttf') format('truetype'); /* Specify the path to your .ttf file */
-    font-weight: normal; /* Optional: Define font weight if applicable */
-    font-style: normal; /* Optional: Define font style if applicable */
-    font-display: swap; /* Optional: Controls how the font is displayed while loading */
-}
-
 body {
     font-family: 'VCR OSD Mono';
 
@@ -40,6 +24,8 @@ body {
     background-position: center;
     background-repeat: repeat;
     background-size: 2.5vw 2.5vw;
+
+    overflow: hidden;
 }
 
 #mirror {
@@ -76,6 +62,60 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+
+    z-index: 999;
+}
+
+#darken {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.3); /* Adjust 0.5 to make it darker or lighter */
+    z-index: 998; /* Ensures it sits on top of everything else */
+    pointer-events: none; /* Allows users to still click elements underneath */
+}
+
+
+@font-face {
+    font-family: 'a Another Tag'; /* Give your font a descriptive name */
+    src: url('res/aAnotherTag.ttf') format('truetype'); /* Specify the path to your .ttf file */
+    font-weight: normal; /* Optional: Define font weight if applicable */
+    font-style: normal; /* Optional: Define font style if applicable */
+    font-display: swap; /* Optional: Controls how the font is displayed while loading */
+}
+
+@font-face {
+    font-family: 'Most Wasted'; /* Give your font a descriptive name */
+    src: url('res/Mostwasted.ttf') format('truetype'); /* Specify the path to your .ttf file */
+    font-weight: normal; /* Optional: Define font weight if applicable */
+    font-style: normal; /* Optional: Define font style if applicable */
+    font-display: swap; /* Optional: Controls how the font is displayed while loading */
+}
+
+@font-face {
+    font-family: 'Aerosoldier'; /* Give your font a descriptive name */
+    src: url('res/Aerosoldier_PERSONAL_USE_ONLY.otf') format('opentype'); /* Specify the path to your .ttf file */
+    font-weight: normal; /* Optional: Define font weight if applicable */
+    font-style: normal; /* Optional: Define font style if applicable */
+    font-display: swap; /* Optional: Controls how the font is displayed while loading */
+}
+
+@font-face {
+    font-family: 'Aerosoldier Symbol'; /* Give your font a descriptive name */
+    src: url('res/AerosoldierSymbol_PERSONAL_USE_ONLY.otf') format('opentype'); /* Specify the path to your .ttf file */
+    font-weight: normal; /* Optional: Define font weight if applicable */
+    font-style: normal; /* Optional: Define font style if applicable */
+    font-display: swap; /* Optional: Controls how the font is displayed while loading */
+}
+
+@font-face {
+    font-family: 'Adrip'; /* Give your font a descriptive name */
+    src: url('res/adrip1.ttf') format('truetype'); /* Specify the path to your .ttf file */
+    font-weight: normal; /* Optional: Define font weight if applicable */
+    font-style: normal; /* Optional: Define font style if applicable */
+    font-display: swap; /* Optional: Controls how the font is displayed while loading */
 }
 
 .graffiti-1 {
@@ -85,5 +125,20 @@ body {
 
 .graffiti-2 {
     font-family: "Most Wasted";
+    position: absolute;
+}
+
+.graffiti-3 {
+    font-family: "Aerosoldier";
+    position: absolute;
+}
+
+.graffiti-4 {
+    font-family: "Adrip";
+    position: absolute;
+}
+
+.graffiti-symbol {
+    font-family: "Aerosoldier Symbol";
     position: absolute;
 }

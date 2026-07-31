@@ -8,12 +8,6 @@ const FTS_script = [
         wait_ms: 1500
     },
     {
-        text: "HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
-        type_ms_per_char: 40,
-        delete_ms_per_char: 5,
-        wait_ms: 500
-    },
-    {
         text: "WELCOME TO MY OWN LITTLE SLICE OF HEAVEN",
         type_ms_per_char: 40,
         delete_ms_per_char: 10,
@@ -26,7 +20,7 @@ const FTS_script = [
         wait_ms: 3000
     },
     {
-        text: "THIS WILL ALWAYS BE A WORK IN PROGRESS",
+        text: "I WILL ALWAYS BE A WORK IN PROGRESS",
         type_ms_per_char: 60,
         delete_ms_per_char: 20,
         wait_ms: 3000
