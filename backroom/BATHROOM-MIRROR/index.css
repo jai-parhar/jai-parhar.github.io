@@ -14,6 +14,14 @@
     font-display: swap; /* Optional: Controls how the font is displayed while loading */
 }
 
+@font-face {
+    font-family: 'Most Wasted'; /* Give your font a descriptive name */
+    src: url('res/Mostwasted.ttf') format('truetype'); /* Specify the path to your .ttf file */
+    font-weight: normal; /* Optional: Define font weight if applicable */
+    font-style: normal; /* Optional: Define font style if applicable */
+    font-display: swap; /* Optional: Controls how the font is displayed while loading */
+}
+
 body {
     font-family: 'VCR OSD Mono';
 
@@ -72,5 +80,10 @@ body {
 
 .graffiti-1 {
     font-family: "a Another Tag";
+    position: absolute;
+}
+
+.graffiti-2 {
+    font-family: "Most Wasted";
     position: absolute;
 }

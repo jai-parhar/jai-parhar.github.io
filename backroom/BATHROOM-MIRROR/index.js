@@ -8,6 +8,7 @@ const webcam = document.getElementById("webcam");
 
 const mirror_canvas = document.getElementById("mirror-canvas");
 const mirror_context = mirror_canvas.getContext("2d");
+mirror_context.imageSmoothingEnabled = false;
 
 function resizeCanvas() {
     mirror_canvas.width = mirror_canvas.clientWidth;
