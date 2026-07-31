@@ -39,111 +39,117 @@ class CensorEffect {
     }
 
     update(face_box) {
-        let face_cx = face_box.x + face_box.w/2;
-        let face_cy = face_box.y + face_box.h/2;
+        for (let i = 0; i < 2; i++) { // Lazy hack way to have updates run a little faster
+            let face_cx = face_box.x + face_box.w/2;
+            let face_cy = face_box.y + face_box.h/2;
 
-        
-        
-        // Update the regions
+            
+            
+            // Update the regions
 
-        this.censor_region = {
-            x: face_cx - CENSOR_REGION_SCALE * face_box.w/2,
-            y: face_cy - CENSOR_REGION_SCALE * face_box.h/2,
-            w: CENSOR_REGION_SCALE * face_box.w,
-            h: CENSOR_REGION_SCALE * face_box.h
-        };
-        this.selector_region = {
-            x: face_cx - SELECTOR_REGION_SCALE * face_box.w/2,
-            y: face_cy - SELECTOR_REGION_SCALE * face_box.h/2,
-            w: SELECTOR_REGION_SCALE * face_box.w,
-            h: SELECTOR_REGION_SCALE * face_box.h
-        };
-        this.bracket_region = {
-            x: face_cx - BRACKET_REGION_SCALE * face_box.w/2,
-            y: face_cy - BRACKET_REGION_SCALE * face_box.h/2,
-            w: BRACKET_REGION_SCALE * face_box.w,
-            h: BRACKET_REGION_SCALE * face_box.h
-        };
-        this.crosshair_region = {
-            x: face_cx - CROSSHAIR_REGION_SCALE * face_box.w/2,
-            y: face_cy - CROSSHAIR_REGION_SCALE * face_box.h/2,
-            w: CROSSHAIR_REGION_SCALE * face_box.w,
-            h: CROSSHAIR_REGION_SCALE * face_box.h
-        };
+            this.censor_region = {
+                x: face_cx - CENSOR_REGION_SCALE * face_box.w/2,
+                y: face_cy - CENSOR_REGION_SCALE * face_box.h/2,
+                w: CENSOR_REGION_SCALE * face_box.w,
+                h: CENSOR_REGION_SCALE * face_box.h
+            };
+            this.selector_region = {
+                x: face_cx - SELECTOR_REGION_SCALE * face_box.w/2,
+                y: face_cy - SELECTOR_REGION_SCALE * face_box.h/2,
+                w: SELECTOR_REGION_SCALE * face_box.w,
+                h: SELECTOR_REGION_SCALE * face_box.h
+            };
+            this.bracket_region = {
+                x: face_cx - BRACKET_REGION_SCALE * face_box.w/2,
+                y: face_cy - BRACKET_REGION_SCALE * face_box.h/2,
+                w: BRACKET_REGION_SCALE * face_box.w,
+                h: BRACKET_REGION_SCALE * face_box.h
+            };
+            this.crosshair_region = {
+                x: face_cx - CROSSHAIR_REGION_SCALE * face_box.w/2,
+                y: face_cy - CROSSHAIR_REGION_SCALE * face_box.h/2,
+                w: CROSSHAIR_REGION_SCALE * face_box.w,
+                h: CROSSHAIR_REGION_SCALE * face_box.h
+            };
 
 
 
-        // Spawn in the effects
+            // Spawn in the effects
 
-        if (this.censor_boxes.length < MAX_CENSOR_BOXES) {
-            // spawn in a censor box
-            this.censor_boxes.push({
-                cx: this.censor_region.x + (Math.random() * this.censor_region.w),
-                cy: this.censor_region.y + (Math.random() * this.censor_region.h),
-                w: ((MAX_CENSOR_SIZE - MIN_CENSOR_SIZE) * Math.random() + MIN_CENSOR_SIZE) * face_box.w,
-                h: ((MAX_CENSOR_SIZE - MIN_CENSOR_SIZE) * Math.random() + MIN_CENSOR_SIZE) * face_box.h
-            });
-        } else { // if same or bigger
-            while (this.censor_boxes.length >= MAX_CENSOR_BOXES) { this.censor_boxes.shift(); }
-        }
-
-        if (this.selector_frame_count >= SELECTOR_FRAMES_PER_UPDATE) {
-            this.selector_frame_count = 0;
-            if (this.selector_boxes.length < MAX_SELECTOR_BOXES) {
-                // sopawn in a selector box
-                this.selector_boxes.push({
-                    cx: this.selector_region.x + (Math.random() * this.selector_region.w),
-                    cy: this.selector_region.y + (Math.random() * this.selector_region.h),
-                    w: ((MAX_SELECTOR_SIZE - MIN_SELECTOR_SIZE) * Math.random() + MIN_SELECTOR_SIZE) * face_box.w,
-                    h: ((MAX_SELECTOR_SIZE - MIN_SELECTOR_SIZE) * Math.random() + MIN_SELECTOR_SIZE) * face_box.h
+            if (this.censor_boxes.length < MAX_CENSOR_BOXES) {
+                // spawn in a censor box
+                this.censor_boxes.push({
+                    cx: this.censor_region.x + (Math.random() * this.censor_region.w),
+                    cy: this.censor_region.y + (Math.random() * this.censor_region.h),
+                    w: ((MAX_CENSOR_SIZE - MIN_CENSOR_SIZE) * Math.random() + MIN_CENSOR_SIZE) * face_box.w,
+                    h: ((MAX_CENSOR_SIZE - MIN_CENSOR_SIZE) * Math.random() + MIN_CENSOR_SIZE) * face_box.h
                 });
-            } else {
-                while (this.selector_boxes.length >= MAX_SELECTOR_BOXES) { this.selector_boxes.shift(); }
+            } else { // if same or bigger
+                while (this.censor_boxes.length >= MAX_CENSOR_BOXES) { this.censor_boxes.shift(); }
             }
-        }
 
-        if (this.bracket_frame_count >= BRACKET_FRAMES_PER_UPDATE) {
-            this.bracket_frame_count = 0;
-            if (this.brackets.length < MAX_BRACKETS) {
-                // put a new one in baby lets go :/
-                this.brackets.push({
-                    cx: this.bracket_region.x + (Math.random() * this.bracket_region.w),
-                    cy: this.bracket_region.y + (Math.random() * this.bracket_region.h),
-                    w: ((MAX_BRACKET_SIZE - MIN_BRACKET_SIZE) * Math.random() + MIN_BRACKET_SIZE) * face_box.w,
-                    h: ((MAX_BRACKET_SIZE - MIN_BRACKET_SIZE) * Math.random() + MIN_BRACKET_SIZE) * face_box.h
-                });
-            } else {
-                while (this.brackets.length >= MAX_BRACKETS) { this.brackets.shift(); }
+            if (this.selector_frame_count >= SELECTOR_FRAMES_PER_UPDATE) {
+                this.selector_frame_count = 0;
+                if (this.selector_boxes.length < MAX_SELECTOR_BOXES) {
+                    // sopawn in a selector box
+                    this.selector_boxes.push({
+                        cx: this.selector_region.x + (Math.random() * this.selector_region.w),
+                        cy: this.selector_region.y + (Math.random() * this.selector_region.h),
+                        w: ((MAX_SELECTOR_SIZE - MIN_SELECTOR_SIZE) * Math.random() + MIN_SELECTOR_SIZE) * face_box.w,
+                        h: ((MAX_SELECTOR_SIZE - MIN_SELECTOR_SIZE) * Math.random() + MIN_SELECTOR_SIZE) * face_box.h
+                    });
+                } else {
+                    while (this.selector_boxes.length >= MAX_SELECTOR_BOXES) { this.selector_boxes.shift(); }
+                }
             }
-        }
 
-        if (this.crosshair_frame_count >= CROSSHAIRS_FRAMES_PER_UPDATE) {
-            this.crosshair_frame_count = 0;
-            if (this.crosshairs.length < MAX_CROSSHAIRS) {
-                // yeah man. new one. wow.
-                let crosshair = {
-                    cx: this.crosshair_region.x + (Math.random() * this.crosshair_region.w),
-                    cy: this.crosshair_region.y + (Math.random() * this.crosshair_region.h),
-                    size: ((MAX_CROSSHAIR_SIZE - MIN_CROSSHAIR_SIZE) * Math.random() + MIN_CROSSHAIR_SIZE) * face_box.w
-                };
-                //
-                // if you want to make it so that not every frame has a new crosshairs you can make % chance that size gets set to 0
-                //
-                this.crosshairs.push(crosshair);
-            } else {
-                while (this.crosshairs.length >= MAX_CROSSHAIRS) { this.crosshairs.shift(); }
+            if (this.bracket_frame_count >= BRACKET_FRAMES_PER_UPDATE) {
+                this.bracket_frame_count = 0;
+                if (this.brackets.length < MAX_BRACKETS) {
+                    // put a new one in baby lets go :/
+                    this.brackets.push({
+                        cx: this.bracket_region.x + (Math.random() * this.bracket_region.w),
+                        cy: this.bracket_region.y + (Math.random() * this.bracket_region.h),
+                        w: ((MAX_BRACKET_SIZE - MIN_BRACKET_SIZE) * Math.random() + MIN_BRACKET_SIZE) * face_box.w,
+                        h: ((MAX_BRACKET_SIZE - MIN_BRACKET_SIZE) * Math.random() + MIN_BRACKET_SIZE) * face_box.h
+                    });
+                } else {
+                    while (this.brackets.length >= MAX_BRACKETS) { this.brackets.shift(); }
+                }
             }
+
+            if (this.crosshair_frame_count >= CROSSHAIRS_FRAMES_PER_UPDATE) {
+                this.crosshair_frame_count = 0;
+                if (this.crosshairs.length < MAX_CROSSHAIRS) {
+                    // yeah man. new one. wow.
+                    let crosshair = {
+                        cx: this.crosshair_region.x + (Math.random() * this.crosshair_region.w),
+                        cy: this.crosshair_region.y + (Math.random() * this.crosshair_region.h),
+                        size: ((MAX_CROSSHAIR_SIZE - MIN_CROSSHAIR_SIZE) * Math.random() + MIN_CROSSHAIR_SIZE) * face_box.w
+                    };
+                    //
+                    // if you want to make it so that not every frame has a new crosshairs you can make % chance that size gets set to 0
+                    //
+                    this.crosshairs.push(crosshair);
+                } else {
+                    while (this.crosshairs.length >= MAX_CROSSHAIRS) { this.crosshairs.shift(); }
+                }
+            }
+
+
+
+            // Update frame counts
+            this.selector_frame_count += 1;
+            this.bracket_frame_count += 1;
+            this.crosshair_frame_count += 1;
         }
-
-
-
-        // Update frame counts
-        this.selector_frame_count += 1;
-        this.bracket_frame_count += 1;
-        this.crosshair_frame_count += 1;
     }
     
     draw(context) {
+        context.imageSmoothingEnabled = false;
+        context.mozImageSmoothingEnabled = false;
+        context.webkitImageSmoothingEnabled = false;
+
         context.fillStyle = "black";
         for (let i = 0; i < this.censor_boxes.length; i++) {
             context.fillRect(

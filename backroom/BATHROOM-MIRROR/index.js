@@ -7,8 +7,9 @@ import {
 const webcam = document.getElementById("webcam");
 
 const mirror_canvas = document.getElementById("mirror-canvas");
-const mirror_context = mirror_canvas.getContext("2d");
-mirror_context.imageSmoothingEnabled = false;
+const mirror_context = mirror_canvas.getContext("2d", {
+    willReadFrequently: true
+});
 
 function resizeCanvas() {
     mirror_canvas.width = mirror_canvas.clientWidth;
@@ -51,10 +52,12 @@ async function initializeFaceDetector() {
 
 
 
+// selected_effect = "censor", "pixelate", "face_follow"
+let possible_effects = [ "censor", "pixelate", "face_follow" ];
+let selected_effect = possible_effects[0];
 
+const effects = [];
 
-
-const censor_effects = [];
 function draw() {
 
     mirror_context.save();
@@ -87,10 +90,12 @@ function draw() {
 
 
     const faces = face_detector.detectForVideo(webcam,performance.now());
-    while (censor_effects.length < faces.detections.length) { 
+    while (effects.length < faces.detections.length) { 
         // add new censor effects to handle
         // we will add a new element for every time we see multiple faces, but reuse the same index
-        censor_effects.push(new CensorEffect());
+        if (selected_effect === "censor") { effects.push(new CensorEffect()); }
+        if (selected_effect === "pixelate") { effects.push(new PixelateEffect()); }
+        if (selected_effect === "face_follow") { effects.push(new FaceFollowEffect()); }
     }
     for (let i = 0; i < faces.detections.length; i++) {
         const box = faces.detections[i].boundingBox;
@@ -107,9 +112,8 @@ function draw() {
         // flip the bounding box horizontally to match the webcam image
         mc_x = mirror_canvas.width - mc_x - mc_w;
 
-        censor_effects[i].update({x: mc_x, y: mc_y, w: mc_w, h: mc_h});
-        censor_effects[i].update({x: mc_x, y: mc_y, w: mc_w, h: mc_h}); // draw a little faster
-        censor_effects[i].draw(mirror_context);
+        effects[i].update({x: mc_x, y: mc_y, w: mc_w, h: mc_h});
+        effects[i].draw(mirror_context);
     }
     
 
