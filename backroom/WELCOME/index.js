@@ -85,7 +85,7 @@ door.addEventListener("click", () => {
     // TODO: SEND TO NEXT PAGE
     startTone(100);
     setTimeout(() => {
-        window.location.href = "../ILOVEYOU/"; // OH SEND EM AWAY!
+        window.location.href = "../HALLWAY/"; // OH SEND EM AWAY!
     }, 3000);
 });
 

@@ -80,6 +80,9 @@ glMatrix.mat4.identity(identity);
 
 let looking_at_door = false;
 let door_index = -1;
+let door_clicked = false;
+let clicked_door_index = -1;
+let clicked_door_angle = 0;
 
 function update() {
 
@@ -95,7 +98,13 @@ function update() {
     if (looking_at_door) {
         setInfoMessageText(doors[door_index].text);
         if (mouse_clicked) {
-            window.location.href = doors[door_index].link;
+            // send em away!
+            // start a little anim
+            door_clicked = true;
+            clicked_door_index = door_index;
+            setTimeout(()=>{
+                window.location.href = doors[door_index].link;
+            }, 600);
         }
     } else {
         let raycast_result = rayMeshIntersection(getCameraRay(camera), spiderWeb.mesh, spiderWeb.model_transform);
@@ -107,6 +116,18 @@ function update() {
         } else {
             setInfoMessageText("");
         }
+    }
+
+    if (door_clicked && clicked_door_angle > -Math.PI/14 ) {
+        // move hinge back after inverse
+        glMatrix.mat4.translate(doors[clicked_door_index].model_transform, doors[clicked_door_index].model_transform, door_pivot);
+
+        // rotate around hinge
+        glMatrix.mat4.rotateY(doors[clicked_door_index].model_transform, doors[clicked_door_index].model_transform, -0.01);
+        clicked_door_angle += -0.01;
+        
+        // move hinge to origin
+        glMatrix.mat4.translate(doors[clicked_door_index].model_transform, doors[clicked_door_index].model_transform, [-door_pivot[0], -door_pivot[1], -door_pivot[2]]);
     }
 
 
@@ -125,11 +146,11 @@ function updateCamera() {
     let forwardVector = flattenY(getCameraForwardVector(camera));
     let rightVector = flattenY(getCameraRightVector(camera));
 
-    if (keys["KeyW"]) {
+    if (keys["KeyW"] || keys["ArrowUp"]) {
         glMatrix.vec3.scaleAndAdd(camera.position, camera.position, forwardVector, cameraSpeed);
     }
 
-    if (keys["KeyS"]) {
+    if (keys["KeyS"] || keys["ArrowDown"]) {
         glMatrix.vec3.scaleAndAdd(camera.position, camera.position, forwardVector, -cameraSpeed);
     }
 
@@ -139,6 +160,21 @@ function updateCamera() {
 
     if (keys["KeyA"]) {
         glMatrix.vec3.scaleAndAdd(camera.position, camera.position, rightVector, -cameraSpeed);
+    }
+
+    const arrow_lookspeed = 0.015;
+    if (keys["ArrowLeft"]) {
+        camera.yaw += arrow_lookspeed;
+    }
+
+    if (keys["ArrowRight"]) {
+        camera.yaw -= arrow_lookspeed;
+    }
+
+    if (keys["Enter"]) {
+        mouse_clicked = true;
+    } else {
+        mouse_clicked =  false;
     }
 
     // fuck it im doing collision like this
@@ -151,6 +187,7 @@ function updateCamera() {
 
 
 const doorTexture = loadTexture(gl, "res/doorclosed_white.png");
+const doorbackTexture = generateSolidTexture(gl, [0, 0, 0, 255]);
 const roofTexture = generateSolidTexture(gl, [225, 226, 187, 255]);
 const floorTexture = generateSolidTexture(gl, [107, 95, 24, 255]);
 const wallTexture = generateSolidTexture(gl, [228, 230, 168, 255]);
@@ -178,11 +215,17 @@ function createDoor(position, rotation, text, link, scale=1) {
 
     glMatrix.mat4.scale(door.model_transform, door.model_transform, [scale, scale, scale]);
 
-    glMatrix.mat4.copy(door.doorback_model_transform, door.model_transform);
+    let offset = glMatrix.mat4.create();
+    glMatrix.mat4.translate(offset, offset, [0, 0, -0.005]);
+
+    // when you take a vector, whats happening is you end up with
+    // door.model_transform * offset * vec
+    // so it transforms in local space first
+    glMatrix.mat4.multiply(door.doorback_model_transform, door.model_transform, offset);
 
     return door;
 }
-
+const door_pivot = [-((8/14) * 10)/2, 0, 0];
 const doors = [];
 doors.push(createDoor([0, -1, 49.9], [Math.PI, 0, 0], "YOU CAME IN THROUGH HERE", "/backroom/WELCOME", 0.8));
 doors.push(createDoor([4.99, -1, 30], [-Math.PI/2, 0, 0], "HOW IT FEELS TO BE JAI", "/backroom/SHRINE", 0.8));
@@ -238,10 +281,14 @@ function draw() {
     drawMesh(gl, room.left, shaderProgram);
     drawMesh(gl, room.right, shaderProgram);
 
-    setTexture(gl, doorTexture, shaderProgram);
     for (let i = 0; i < doors.length; i++) {
+        setTexture(gl, doorTexture, shaderProgram);
         gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, doors[i].model_transform);
         drawMesh(gl, doors[i].mesh, shaderProgram);
+
+        setTexture(gl, doorbackTexture, shaderProgram);
+        gl.uniformMatrix4fv(gl.getUniformLocation(shaderProgram,"model"), false, doors[i].doorback_model_transform);
+        drawMesh(gl, doors[i].doorback_mesh, shaderProgram);
     }
 
     setTexture(gl, spiderWebTexture, shaderProgram);
