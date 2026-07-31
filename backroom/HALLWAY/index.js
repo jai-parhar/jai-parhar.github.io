@@ -142,6 +142,25 @@ function update() {
     updateCamera();
 }
 
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+        // undo the door transform and reset the door variables
+        glMatrix.mat4.translate(doors[clicked_door_index].model_transform, doors[clicked_door_index].model_transform, door_pivot);
+
+        // rotate around hinge
+        glMatrix.mat4.rotateY(doors[clicked_door_index].model_transform, doors[clicked_door_index].model_transform, -clicked_door_angle);
+        clicked_door_angle = 0;
+        
+        // move hinge to origin
+        glMatrix.mat4.translate(doors[clicked_door_index].model_transform, doors[clicked_door_index].model_transform, [-door_pivot[0], -door_pivot[1], -door_pivot[2]]);
+
+        looking_at_door = false;
+        door_index = -1;
+        door_clicked = false;
+        clicked_door_index = -1;
+    }
+});
+
 function updateCamera() {
     let forwardVector = flattenY(getCameraForwardVector(camera));
     let rightVector = flattenY(getCameraRightVector(camera));
@@ -229,8 +248,8 @@ const door_pivot = [-((8/14) * 10)/2, 0, 0];
 const doors = [];
 doors.push(createDoor([0, -1, 49.9], [Math.PI, 0, 0], "YOU CAME IN THROUGH HERE", "/backroom/WELCOME", 0.8));
 doors.push(createDoor([4.99, -1, 30], [-Math.PI/2, 0, 0], "HOW IT FEELS TO BE JAI", "/backroom/SHRINE", 0.8));
-doors.push(createDoor([-4.99, -1, 30], [Math.PI/2, 0, 0], "HOW IT FEELS TO BE JAI ALSO", "/backroom/ANTISHRINE", 0.8));
-doors.push(createDoor([-4.99, -1, 10], [Math.PI/2, 0, 0], "A QUIET MOMENT OF REFLECTION", "/backroom/BATHROOM-MIRROR", 0.8));
+doors.push(createDoor([-4.99, -1, 30], [Math.PI/2, 0, 0], "HOW IT FEELS TO BE JAI ALSO (WIP)", "/backroom/ANTISHRINE", 0.8));
+doors.push(createDoor([-4.99, -1, 10], [Math.PI/2, 0, 0], "A QUIET MOMENT OF REFLECTION (WIP)", "/backroom/BATHROOM-MIRROR", 0.8));
 
 
 const spiderWebTexture = loadTexture(gl, "res/spiderweb.png");
