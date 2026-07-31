@@ -59,8 +59,8 @@ document.addEventListener("mousemove", (event)=>{
     camera.pitch -= event.movementY * mouse_sensitivity;
 });
 let mouse_clicked = false;
-document.addEventListener("mousedown", ()=> { mouse_clicked = true; });
-document.addEventListener("mouseup", ()=> { mouse_clicked = false; });
+document.addEventListener("mousedown", ()=> { if(document.pointerLockElement !== canvas) { return; } mouse_clicked = true; });
+document.addEventListener("mouseup", ()=> { if(document.pointerLockElement !== canvas) { return; } mouse_clicked = false; });
 
 
 const shaderProgram = await createShaderProgram(gl, "./res/vert.glsl", "./res/frag.glsl");
