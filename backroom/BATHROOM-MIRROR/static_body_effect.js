@@ -34,9 +34,10 @@ class StaticBodyEffect {
                 imageData.data[4 * i + 3] = 0;
             } else {
                 // background
-                imageData.data[4 * i + 0] = 255;
-                imageData.data[4 * i + 1] = 0;
-                imageData.data[4 * i + 2] = 0;
+                const c = Math.floor(Math.random() * 255);
+                imageData.data[4 * i + 0] = c;
+                imageData.data[4 * i + 1] = c;
+                imageData.data[4 * i + 2] = c;
                 imageData.data[4 * i + 3] = 255;
             }
             

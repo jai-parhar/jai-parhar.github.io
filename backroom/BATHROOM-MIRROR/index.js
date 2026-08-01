@@ -87,8 +87,6 @@ const effects = [];
 let face_result;
 
 let segmentation_result;
-let segmentation_timer = 0;
-
 function draw() {
 
     mirror_context.save();
@@ -127,11 +125,9 @@ function draw() {
     // scaled_down_mirror_canvas has a scaled down version of the image we need
 
 
-    if (performance.now() - segmentation_timer > 50) { // only run every 200 ms
-        segmentation_result = image_segmenter.segmentForVideo(scaled_down_mirror_canvas, performance.now());
-        segmentation_mask = segmentation_result.categoryMask;
-        segmentation_timer = performance.now();
-    }
+    segmentation_result = image_segmenter.segmentForVideo(scaled_down_mirror_canvas, performance.now());
+    segmentation_mask = segmentation_result.categoryMask;
+    
 
     face_result = face_detector.detectForVideo(mirror_canvas,performance.now());
     while (effects.length < face_result.detections.length) { 
