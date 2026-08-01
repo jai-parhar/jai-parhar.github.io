@@ -9,7 +9,7 @@ class PixelateEffect {
         this.face_box = {x:0, y:0, w:0, h:0}; 
     }
 
-    update(face_box) {
+    update(face_box, segmentation_mask) {
         this.face_box = face_box;
     }
 

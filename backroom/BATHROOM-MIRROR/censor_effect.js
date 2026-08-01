@@ -38,7 +38,7 @@ class CensorEffect {
         this.crosshairs = [];
     }
 
-    update(face_box) {
+    update(face_box, segmentation_mask) {
         for (let i = 0; i < 2; i++) { // Lazy hack way to have updates run a little faster
             let face_cx = face_box.x + face_box.w/2;
             let face_cy = face_box.y + face_box.h/2;

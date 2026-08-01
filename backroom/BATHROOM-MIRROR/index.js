@@ -1,6 +1,7 @@
 
 import {
     FaceDetector,
+    ImageSegmenter,
     FilesetResolver
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35";
 
@@ -11,11 +12,18 @@ const mirror_context = mirror_canvas.getContext("2d", {
     willReadFrequently: true
 });
 
+const scaled_down_mirror_scale = 1/8;
+const scaled_down_mirror_canvas = document.createElement("canvas");
+const scaled_down_mirror_context = scaled_down_mirror_canvas.getContext("2d");
+
 function resizeCanvas() {
     mirror_canvas.width = mirror_canvas.clientWidth;
     mirror_canvas.height = mirror_canvas.clientHeight;
+    scaled_down_mirror_canvas.width = scaled_down_mirror_scale * mirror_canvas.width;
+    scaled_down_mirror_canvas.height = scaled_down_mirror_scale * mirror_canvas.height;
 }
 window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
 async function startWebcam() {
     const stream = await navigator.mediaDevices.getUserMedia({video: { facingMode: "user" }, audio: false});
@@ -26,13 +34,15 @@ async function startWebcam() {
 }
 
 
+let vision;
+async function initializeMediaPipe() {
+    vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm"
+    );
+}
 
 let face_detector;
 async function initializeFaceDetector() {
-    const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm"
-    );
-
     face_detector = await FaceDetector.createFromOptions(
         vision,
         {
@@ -46,6 +56,22 @@ async function initializeFaceDetector() {
     );
 }
 
+let image_segmenter;
+let segmentation_mask;
+async function initializeImageSegmenter() {
+    image_segmenter = await ImageSegmenter.createFromOptions(
+        vision,
+        {
+            baseOptions: {
+                modelAssetPath:
+                    "res/selfie_segmenter_landscape.tflite"//"res/selfie_multiclass_256x256.tflite"//"https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float32/latest/selfie_segmenter.tflite"
+            },
+            runningMode: "VIDEO",
+            outputCategoryMask: true
+        }
+    );
+}
+
 
 
 
@@ -53,10 +79,15 @@ async function initializeFaceDetector() {
 
 
 // selected_effect = "censor", "pixelate", "face_follow"
-let possible_effects = [ "censor", "pixelate", "face_follow" ];
-let selected_effect = possible_effects[0];
+let possible_effects = [ "censor", "pixelate", "face_follow", "static_body" ];
+let selected_effect = possible_effects[3];
 
 const effects = [];
+
+let face_result;
+
+let segmentation_result;
+let segmentation_timer = 0;
 
 function draw() {
 
@@ -88,31 +119,33 @@ function draw() {
     
     mirror_context.restore();
 
+    scaled_down_mirror_context.drawImage(mirror_canvas,
+        0, 0, mirror_canvas.width, mirror_canvas.height,
+        0, 0, scaled_down_mirror_canvas.width, scaled_down_mirror_canvas.height
+    );
+    // mirror_canvas now has the image we need
+    // scaled_down_mirror_canvas has a scaled down version of the image we need
 
-    const faces = face_detector.detectForVideo(webcam,performance.now());
-    while (effects.length < faces.detections.length) { 
+
+    if (performance.now() - segmentation_timer > 50) { // only run every 200 ms
+        segmentation_result = image_segmenter.segmentForVideo(scaled_down_mirror_canvas, performance.now());
+        segmentation_mask = segmentation_result.categoryMask;
+        segmentation_timer = performance.now();
+    }
+
+    face_result = face_detector.detectForVideo(mirror_canvas,performance.now());
+    while (effects.length < face_result.detections.length) { 
         // add new censor effects to handle
         // we will add a new element for every time we see multiple faces, but reuse the same index
         if (selected_effect === "censor") { effects.push(new CensorEffect()); }
         if (selected_effect === "pixelate") { effects.push(new PixelateEffect()); }
         if (selected_effect === "face_follow") { effects.push(new FaceFollowEffect()); }
+        if (selected_effect === "static_body") { effects.push(new StaticBodyEffect()); }
     }
-    for (let i = 0; i < faces.detections.length; i++) {
-        const box = faces.detections[i].boundingBox;
+    for (let i = 0; i < face_result.detections.length; i++) {
+        const box = face_result.detections[i].boundingBox;
 
-        // convert webcam coordinates to mirror_canvas coordinates
-        const scaleX = mirror_canvas.width / crop_w;
-        const scaleY = mirror_canvas.height / crop_h;
-
-        let mc_x = (box.originX - crop_x) * scaleX;
-        let mc_y = (box.originY - crop_y) * scaleY;
-        let mc_w = box.width * scaleX;
-        let mc_h = box.height * scaleY;
-
-        // flip the bounding box horizontally to match the webcam image
-        mc_x = mirror_canvas.width - mc_x - mc_w;
-
-        effects[i].update({x: mc_x, y: mc_y, w: mc_w, h: mc_h});
+        effects[i].update({x: box.originX, y: box.originY, w: box.width, h: box.height}, segmentation_mask);
         effects[i].draw(mirror_context);
     }
     
@@ -121,6 +154,7 @@ function draw() {
 }
 
 
-
+await initializeMediaPipe();
 await initializeFaceDetector();
+await initializeImageSegmenter();
 await startWebcam();
