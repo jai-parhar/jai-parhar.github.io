@@ -6,9 +6,15 @@
     font-display: swap; /* Optional: Controls how the font is displayed while loading */
 }
 
-body {
-    font-family: 'VCR OSD Mono';
+@font-face {
+    font-family: 'Moms Typewriter'; /* Give your font a descriptive name */
+    src: url('res/momstypewriter.ttf') format('truetype'); /* Specify the path to your .ttf file */
+    font-weight: normal; /* Optional: Define font weight if applicable */
+    font-style: normal; /* Optional: Define font style if applicable */
+    font-display: swap; /* Optional: Controls how the font is displayed while loading */
+}
 
+body {
     margin: 0;
 
     display: flex;
@@ -52,9 +58,6 @@ body {
 }
 
 #message {
-    background-color: black;
-    color: white;
-
     margin-top: 3vh;
 
     font-size: 5vh;

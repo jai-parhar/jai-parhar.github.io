@@ -6,7 +6,7 @@ class StaticBodyEffect {
         this.segmentation_mask = null;
     }
 
-    update(face_box, segmentation_mask) {
+    update(segmentation_mask) {
         this.segmentation_mask = segmentation_mask;
     }
 

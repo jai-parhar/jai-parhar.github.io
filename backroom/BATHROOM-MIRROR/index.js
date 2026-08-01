@@ -80,12 +80,12 @@ async function initializeImageSegmenter() {
 
 // selected_effect = "censor", "pixelate", "face_follow"
 let possible_effects = [ "censor", "pixelate", "face_follow", "static_body" ];
-let selected_effect = possible_effects[3];
+let selected_effect = possible_effects[0];
 
-const effects = [];
+const face_effects = [];
+let segmented_effect;
 
 let face_result;
-
 let segmentation_result;
 function draw() {
 
@@ -124,26 +124,46 @@ function draw() {
     // mirror_canvas now has the image we need
     // scaled_down_mirror_canvas has a scaled down version of the image we need
 
+    // face effects
+    if (selected_effect == "censor" || 
+            selected_effect == "pixelate" ||
+            selected_effect == "face_follow") {
+        
+        // get all faces
+        face_result = face_detector.detectForVideo(mirror_canvas,performance.now());
+        while (face_effects.length < face_result.detections.length) { // loop over all faces
+            // add new censor effects to handle
+            // we will add a new element for every time we see multiple faces, but reuse the same index
+            if (selected_effect === "censor") { face_effects.push(new CensorEffect()); }
+            if (selected_effect === "pixelate") { face_effects.push(new PixelateEffect()); }
+            if (selected_effect === "face_follow") { face_effects.push(new FaceFollowEffect()); }
+        }
+        for (let i = 0; i < face_result.detections.length; i++) { // do the update and draw for all faces
+            const box = face_result.detections[i].boundingBox;
 
-    segmentation_result = image_segmenter.segmentForVideo(scaled_down_mirror_canvas, performance.now());
-    segmentation_mask = segmentation_result.categoryMask;
+            face_effects[i].update({x: box.originX, y: box.originY, w: box.width, h: box.height}); 
+            face_effects[i].draw(mirror_context);
+        }
+        
+        // handle the message
+        if (selected_effect === "censor") { updateCensorMessage(); }
+    }
+
+    // segmentation effects
+    if (selected_effect == "static_body") { // put the OR here
+        segmentation_result = image_segmenter.segmentForVideo(scaled_down_mirror_canvas, performance.now());
+        segmentation_mask = segmentation_result.categoryMask;
+
+        if (selected_effect == "static_body" || !segmented_effect) {
+            segmented_effect = new StaticBodyEffect();
+        }
+
+        segmented_effect.update(segmentation_mask);
+        segmented_effect.draw(mirror_context);
+    }
     
-
-    face_result = face_detector.detectForVideo(mirror_canvas,performance.now());
-    while (effects.length < face_result.detections.length) { 
-        // add new censor effects to handle
-        // we will add a new element for every time we see multiple faces, but reuse the same index
-        if (selected_effect === "censor") { effects.push(new CensorEffect()); }
-        if (selected_effect === "pixelate") { effects.push(new PixelateEffect()); }
-        if (selected_effect === "face_follow") { effects.push(new FaceFollowEffect()); }
-        if (selected_effect === "static_body") { effects.push(new StaticBodyEffect()); }
-    }
-    for (let i = 0; i < face_result.detections.length; i++) {
-        const box = face_result.detections[i].boundingBox;
-
-        effects[i].update({x: box.originX, y: box.originY, w: box.width, h: box.height}, segmentation_mask);
-        effects[i].draw(mirror_context);
-    }
+    // you can put other effects below
+    
     
 
     requestAnimationFrame(draw);
