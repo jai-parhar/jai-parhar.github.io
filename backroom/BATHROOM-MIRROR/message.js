@@ -70,7 +70,9 @@ function updateCensorMessage() {
 
 
 // CODE FOR THE FACE FOLLOW EFFECT -----------------------------------------------------------------------------------------------------------
-// TODO: THIS
+function updateFaceFollowMessage() {
+    
+}
 
 
 // CODE FOR THE STATIC BODY EFFECT -----------------------------------------------------------------------------------------------------------

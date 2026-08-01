@@ -80,7 +80,7 @@ async function initializeImageSegmenter() {
 
 // selected_effect = "censor", "pixelate", "face_follow"
 let possible_effects = [ "censor", "pixelate", "face_follow", "static_body" ];
-let selected_effect = possible_effects[2];
+let selected_effect = possible_effects[3];
 
 const face_effects = [];
 let segmented_effect;
@@ -147,6 +147,7 @@ function draw() {
         
         // handle the message
         if (selected_effect === "censor") { updateCensorMessage(); }
+        if (selected_effect === "face_follow") { updateFaceFollowMessage(); }
     }
 
     // segmentation effects
