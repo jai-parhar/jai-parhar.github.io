@@ -1,16 +1,15 @@
 
 const messageElement = document.getElementById("message");
 
-let timers = [Date.now()];
-
 let start_timer = Date.now();
 const START_TIME_DELAY = 3000; // ms
 
 
 // CODE FOR THE CENSOR EFFECT -----------------------------------------------------------------------------------------------------------
 // YOU FEEL PARTICULARLY [redacted] TODAY
-const CENSOR_TYPE_MS_PER_CHAR = 250;
 
+let censor_type_timer = 0;
+const CENSOR_TYPE_MS_PER_CHAR = 250;
 const CENSOR_PRE_TEXT = "YOU FEEL PARTICULARLY ";
 const CENSOR_POST_TEXT = " TODAY";
 let censor_pre_index = 0;
@@ -30,9 +29,8 @@ function updateCensorMessage() {
     }
 
     // skip the rest if we aint finished yet
-    if (Date.now() - timers[0] < CENSOR_TYPE_MS_PER_CHAR) { return; }
-
-    timers[0] = Date.now();
+    if (Date.now() - censor_type_timer < CENSOR_TYPE_MS_PER_CHAR) { return; }
+    censor_type_timer = Date.now();
 
     if (censor_pre_index < CENSOR_PRE_TEXT.length) { // type the text pre censor bar
         messageElement.append(CENSOR_PRE_TEXT[censor_pre_index++]);
@@ -65,4 +63,66 @@ function updateCensorMessage() {
     } else if (censor_post_index < CENSOR_POST_TEXT.length) { // finish typing the text
         messageElement.append(CENSOR_POST_TEXT[censor_post_index++]);
     }
+}
+
+// CODE FOR THE PIXELATE EFFECT -----------------------------------------------------------------------------------------------------------
+// TODO: THIS
+
+
+// CODE FOR THE FACE FOLLOW EFFECT -----------------------------------------------------------------------------------------------------------
+// TODO: THIS
+
+
+// CODE FOR THE STATIC BODY EFFECT -----------------------------------------------------------------------------------------------------------
+const STATICBODY_TYPE_MS_PER_CHAR = 250;
+
+let staticbody_type_timer = Date.now();
+
+const STATICBODY_FULL_TEXT = "THE IMAGE FEELS DIFFICULT TO REMEMBER...";
+const STATICBODY_GLITCH_CHARS = "#@%?█▒░/\\";
+
+let staticbody_current_text = "";
+
+let staticbody_glitch_timer = Date.now();
+let staticbody_glitch_index = -1;
+let staticbody_jitter_timer = Date.now();
+
+const STATICBODY_MIN_GLITCH_TIME = 100;
+const STATICBODY_MAX_GLITCH_TIME = 3000;
+let staticbody_next_glitch_time = ((STATICBODY_MAX_GLITCH_TIME - STATICBODY_MIN_GLITCH_TIME) * Math.random()) + STATICBODY_MIN_GLITCH_TIME;
+
+function updateStaticBodyMessage() {
+    messageElement.style.fontFamily = "VCR OSD Mono";
+    messageElement.style.background = "black";
+    messageElement.style.color = "white";
+
+    if (Date.now() - start_timer < START_TIME_DELAY) { return; }
+    
+    if (Date.now() - staticbody_type_timer > STATICBODY_TYPE_MS_PER_CHAR) {
+        staticbody_type_timer = Date.now();
+        if (staticbody_current_text.length < STATICBODY_FULL_TEXT.length) {
+            staticbody_current_text += STATICBODY_FULL_TEXT[staticbody_current_text.length];
+            messageElement.textContent = staticbody_current_text;
+        }
+    }
+
+    if (Date.now() - staticbody_jitter_timer > 50) {
+        staticbody_jitter_timer = Date.now();
+        const x = (Math.random() * 2 - 1) * 4;
+        const scaleX = 1 + (Math.random() - 0.5) * 0.05;
+        messageElement.style.transform = `translateX(${x}px) scaleX(${scaleX})`;
+    }
+
+    if (Date.now() - staticbody_glitch_timer > staticbody_next_glitch_time) {
+        staticbody_next_glitch_time = ((STATICBODY_MAX_GLITCH_TIME - STATICBODY_MIN_GLITCH_TIME) * Math.random()) + STATICBODY_MIN_GLITCH_TIME;
+        staticbody_glitch_timer = Date.now();
+        staticbody_glitch_index = Math.floor(Math.random() * (staticbody_current_text.length + 1));
+        const text_chars = staticbody_current_text.split("");
+        text_chars[staticbody_glitch_index] = STATICBODY_GLITCH_CHARS[Math.floor(Math.random() * (STATICBODY_GLITCH_CHARS.length + 1))];
+        messageElement.textContent = text_chars.join("");
+        setTimeout(()=>{
+            messageElement.textContent = staticbody_current_text;
+        }, 100);
+    }
+    
 }

@@ -80,7 +80,7 @@ async function initializeImageSegmenter() {
 
 // selected_effect = "censor", "pixelate", "face_follow"
 let possible_effects = [ "censor", "pixelate", "face_follow", "static_body" ];
-let selected_effect = possible_effects[0];
+let selected_effect = possible_effects[2];
 
 const face_effects = [];
 let segmented_effect;
@@ -154,12 +154,13 @@ function draw() {
         segmentation_result = image_segmenter.segmentForVideo(scaled_down_mirror_canvas, performance.now());
         segmentation_mask = segmentation_result.categoryMask;
 
-        if (selected_effect == "static_body" || !segmented_effect) {
-            segmented_effect = new StaticBodyEffect();
-        }
+        if (selected_effect == "static_body" || !segmented_effect) { segmented_effect = new StaticBodyEffect(); }
 
         segmented_effect.update(segmentation_mask);
         segmented_effect.draw(mirror_context);
+
+        // handle the message
+        if (selected_effect === "static_body") { updateStaticBodyMessage(); }
     }
     
     // you can put other effects below
