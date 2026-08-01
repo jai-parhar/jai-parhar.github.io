@@ -84,6 +84,7 @@ let selected_effect = possible_effects[3];
 
 const face_effects = [];
 let segmented_effect;
+let standard_effect;
 
 let face_result;
 let segmentation_result;
@@ -126,7 +127,6 @@ function draw() {
 
     // face effects
     if (selected_effect == "censor" || 
-            selected_effect == "pixelate" ||
             selected_effect == "face_follow") {
         
         // get all faces
@@ -135,7 +135,6 @@ function draw() {
             // add new censor effects to handle
             // we will add a new element for every time we see multiple faces, but reuse the same index
             if (selected_effect === "censor") { face_effects.push(new CensorEffect()); }
-            if (selected_effect === "pixelate") { face_effects.push(new PixelateEffect()); }
             if (selected_effect === "face_follow") { face_effects.push(new FaceFollowEffect()); }
         }
         for (let i = 0; i < face_result.detections.length; i++) { // do the update and draw for all faces
@@ -151,11 +150,11 @@ function draw() {
     }
 
     // segmentation effects
-    if (selected_effect == "static_body") { // put the OR here
+    if (selected_effect === "static_body") { // put the OR here
         segmentation_result = image_segmenter.segmentForVideo(scaled_down_mirror_canvas, performance.now());
         segmentation_mask = segmentation_result.categoryMask;
 
-        if (selected_effect == "static_body" || !segmented_effect) { segmented_effect = new StaticBodyEffect(); }
+        if (selected_effect === "static_body" && !segmented_effect) { segmented_effect = new StaticBodyEffect(); }
 
         segmented_effect.update(segmentation_mask);
         segmented_effect.draw(mirror_context);
@@ -165,7 +164,14 @@ function draw() {
     }
     
     // you can put other effects below
-    
+    if (selected_effect === "pixelate") { // put more OR stuff here
+
+        if(selected_effect === "pixelate" && !standard_effect) { standard_effect = new PixelateEffect(); }
+
+        standard_effect.update({});
+        standard_effect.draw(mirror_context);
+
+    }
     
 
     requestAnimationFrame(draw);

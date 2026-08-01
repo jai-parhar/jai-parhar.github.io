@@ -71,7 +71,7 @@ function updateCensorMessage() {
 
 // CODE FOR THE FACE FOLLOW EFFECT -----------------------------------------------------------------------------------------------------------
 function updateFaceFollowMessage() {
-    
+
 }
 
 
@@ -80,7 +80,7 @@ const STATICBODY_TYPE_MS_PER_CHAR = 250;
 
 let staticbody_type_timer = Date.now();
 
-const STATICBODY_FULL_TEXT = "THE IMAGE FEELS DIFFICULT TO REMEMBER...";
+const STATICBODY_FULL_TEXT = "IT ALL FEELS DIFFICULT TO REMEMBER...";
 const STATICBODY_GLITCH_CHARS = "#@%?█▒░/\\";
 
 let staticbody_current_text = "";
