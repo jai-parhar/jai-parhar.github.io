@@ -66,7 +66,9 @@ function updateCensorMessage() {
 }
 
 // CODE FOR THE PIXELATE EFFECT -----------------------------------------------------------------------------------------------------------
-// TODO: THIS
+function updatePixelateEffect() {
+    
+}
 
 
 // CODE FOR THE FACE FOLLOW EFFECT -----------------------------------------------------------------------------------------------------------
