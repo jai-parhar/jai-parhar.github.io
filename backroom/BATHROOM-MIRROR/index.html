@@ -18,7 +18,9 @@
     <div id="mirror">
         <canvas id="mirror-canvas"></canvas>
     </div>
-    <div id="message"></div>
+    <div id="message-container">
+        <div id="message"></div>
+    </div>
 
     <div class="graffiti-1" style="color: darkred; top:28%; left:-1%; font-size:4vw; transform: rotate(34deg);">JAI WUZ HERE</div>
     <div class="graffiti-2" style="color: darkslateblue; bottom:14%; right:-5%; font-size:3vw; transform: rotate(-63deg);">
@@ -37,6 +39,7 @@
     <video id="webcam" autoplay playsinline style="display:none;"></video> <!-- hidden, just to have the id -->
 
     <!-- <script src="/backroom/NOPHONES.js"></script> -->
+    <script src="html2canvas.min.js"></script>
     <script src="censor_effect.js"></script>
     <script src="pixelate_effect.js"></script>
     <script src="face_follow_effect.js"></script>

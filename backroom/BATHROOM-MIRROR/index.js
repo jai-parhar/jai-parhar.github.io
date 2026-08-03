@@ -79,8 +79,11 @@ async function initializeImageSegmenter() {
 
 
 // selected_effect = "censor", "pixelate", "face_follow"
-let possible_effects = [ "censor", "pixelate", "face_follow", "static_body" ];
-let selected_effect = possible_effects[3];
+let possible_effects = [ "censor", "pixelate", "static_body", "face_follow"];
+let selected_index = Math.floor(Math.random() * (2 + 1));
+let selected_effect = possible_effects[selected_index];
+
+// selected_effect = possible_effects[3];
 
 const face_effects = [];
 let segmented_effect;
@@ -171,6 +174,8 @@ function draw() {
         standard_effect.update({});
         standard_effect.draw(mirror_context);
 
+        // handle the message
+        if (selected_effect === "pixelate") { updatePixelateEffect(); }
     }
     
 

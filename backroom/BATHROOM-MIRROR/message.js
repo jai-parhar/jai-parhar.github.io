@@ -8,7 +8,7 @@ const START_TIME_DELAY = 3000; // ms
 // CODE FOR THE CENSOR EFFECT -----------------------------------------------------------------------------------------------------------
 // YOU FEEL PARTICULARLY [redacted] TODAY
 
-let censor_type_timer = 0;
+let censor_type_timer = Date.now();
 const CENSOR_TYPE_MS_PER_CHAR = 250;
 const CENSOR_PRE_TEXT = "YOU FEEL PARTICULARLY ";
 const CENSOR_POST_TEXT = " TODAY";
@@ -66,8 +66,27 @@ function updateCensorMessage() {
 }
 
 // CODE FOR THE PIXELATE EFFECT -----------------------------------------------------------------------------------------------------------
-function updatePixelateEffect() {
+const PIXELATE_TYPE_MS_PER_CHAR = 250;
+
+let pixelate_type_timer = Date.now();
+let pixelate_current_text = "";
+
+const PIXELATE_FULL_TEXT = "YOU FEEL 8 BIT..."
+function updatePixelateEffect() { // background effect has been handled in pixelate_effect.js
     
+    messageElement.style.fontFamily = "Early Gameboy";
+    messageElement.style.background = "#9cbc0f";
+    messageElement.style.color = "#0f380f";
+
+    if (Date.now() - start_timer < START_TIME_DELAY) { return; }
+
+    if (Date.now() - pixelate_type_timer > PIXELATE_TYPE_MS_PER_CHAR) {
+        pixelate_type_timer = Date.now();
+        if (pixelate_current_text.length < PIXELATE_FULL_TEXT.length) {
+            pixelate_current_text += PIXELATE_FULL_TEXT[pixelate_current_text.length];
+            messageElement.textContent = pixelate_current_text;
+        }
+    }
 }
 
 
