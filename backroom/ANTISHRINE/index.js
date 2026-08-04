@@ -296,7 +296,7 @@ function draw_scratcheyes_effect() {
     handsome_context.clearRect(0, 0, handsome_canvas.width, handsome_canvas.height);
     handsome_context.lineWidth = SCRATCH_WIDTH;
     handsome_context.strokeStyle = "black";
-    for (i = 0; i < scratches.length; i++) {
+    for (let i = 0; i < scratches.length; i++) {
         let start_x = scratches[i].cx - (scratches[i].length * Math.cos(scratches[i].angle));
         let start_y = scratches[i].cy - (scratches[i].length * Math.sin(scratches[i].angle));
         let end_x = scratches[i].cx + (scratches[i].length * Math.cos(scratches[i].angle));

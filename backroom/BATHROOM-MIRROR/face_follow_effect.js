@@ -8,7 +8,10 @@ class FaceFollowEffect {
         this.canvasAspectRatio = 1;
     }
 
-    update(face_box) {
+    update(detection) {
+        const box = detection.boundingBox;
+        const face_box = ({x: box.originX, y: box.originY, w: box.width, h: box.height});
+
         this.face_box.h = face_box.h * 1.3;
         this.face_box.w = this.face_box.h * this.canvasAspectRatio;
         this.face_box.y = (face_box.y + face_box.h/2) - this.face_box.h/2 - this.face_box.h/14; // this last term is an offset

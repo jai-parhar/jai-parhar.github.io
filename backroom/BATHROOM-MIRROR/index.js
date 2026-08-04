@@ -79,11 +79,11 @@ async function initializeImageSegmenter() {
 
 
 // selected_effect = "censor", "pixelate", "face_follow"
-let possible_effects = [ "censor", "pixelate", "static_body", "face_follow"];
+let possible_effects = [ "censor", "pixelate", "static_body", "scratched_eyes", "face_follow"];
 let selected_index = Math.floor(Math.random() * (2 + 1));
 let selected_effect = possible_effects[selected_index];
 
-// selected_effect = possible_effects[3];
+//selected_effect = possible_effects[3];
 
 const face_effects = [];
 let segmented_effect;
@@ -130,7 +130,8 @@ function draw() {
 
     // face effects
     if (selected_effect == "censor" || 
-            selected_effect == "face_follow") {
+            selected_effect == "face_follow" ||
+            selected_effect == "scratched_eyes") {
         
         // get all faces
         face_result = face_detector.detectForVideo(mirror_canvas,performance.now());
@@ -138,17 +139,17 @@ function draw() {
             // add new censor effects to handle
             // we will add a new element for every time we see multiple faces, but reuse the same index
             if (selected_effect === "censor") { face_effects.push(new CensorEffect()); }
+            if (selected_effect === "scratched_eyes") { face_effects.push(new ScratchedEyesEffect()); }
             if (selected_effect === "face_follow") { face_effects.push(new FaceFollowEffect()); }
         }
         for (let i = 0; i < face_result.detections.length; i++) { // do the update and draw for all faces
-            const box = face_result.detections[i].boundingBox;
-
-            face_effects[i].update({x: box.originX, y: box.originY, w: box.width, h: box.height}); 
+            face_effects[i].update(face_result.detections[i]); 
             face_effects[i].draw(mirror_context);
         }
         
         // handle the message
         if (selected_effect === "censor") { updateCensorMessage(); }
+        if (selected_effect === "scratched_eyes") { updateScratchedEyesMessage(); }
         if (selected_effect === "face_follow") { updateFaceFollowMessage(); }
     }
 

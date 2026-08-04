@@ -90,11 +90,6 @@ function updatePixelateEffect() { // background effect has been handled in pixel
 }
 
 
-// CODE FOR THE FACE FOLLOW EFFECT -----------------------------------------------------------------------------------------------------------
-function updateFaceFollowMessage() {
-
-}
-
 
 // CODE FOR THE STATIC BODY EFFECT -----------------------------------------------------------------------------------------------------------
 const STATICBODY_TYPE_MS_PER_CHAR = 250;
@@ -148,4 +143,18 @@ function updateStaticBodyMessage() {
         }, 100);
     }
     
+}
+
+
+
+// CODE FOR THE SCRATCHED EYES EFFECT -----------------------------------------------------------------------------------------------------------
+function updateScratchedEyesMessage() {
+
+}
+
+
+
+// CODE FOR THE FACE FOLLOW EFFECT -----------------------------------------------------------------------------------------------------------
+function updateFaceFollowMessage() {
+
 }
