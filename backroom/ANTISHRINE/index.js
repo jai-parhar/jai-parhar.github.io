@@ -38,12 +38,15 @@ document.querySelectorAll(".image-wrapper").forEach(wrapper => {
 let abs_canvas = document.getElementById("abs-canvas");
 let abs_context = abs_canvas.getContext("2d");
 
+let handsome_canvas = document.getElementById("handsome-canvas");
+let handsome_context = handsome_canvas.getContext("2d");
 
 
 
 
 function update() {
     update_censor_effect();
+    update_scratcheyes_effect();
 }
 
 
@@ -51,6 +54,7 @@ function draw() {
     overlay_context.clearRect(0, 0, overlay_canvas.width, overlay_canvas.height);
 
     draw_censor_effect();
+    draw_scratcheyes_effect();
 
     // abs_context.beginPath(); // Start a new drawing path
     // abs_context.arc(abs_face_cx, abs_face_cy, 100, 0, 2 * Math.PI); // Define the circle path
@@ -249,7 +253,61 @@ function draw_censor_effect() {
 }
 
 
+// Code for the scratched out eyes effect
+const eye1 = {cx: 750, cy: 1530};
+const eye2 = {cx: 1235, cy: 1500};
 
+const SCRATCH_ANGLE_AMPLITUDE = Math.PI/6; // 180/6 = 30 degrees
+const SCRATCH_MIN_LENGTH = 50;
+const SCRATCH_MAX_LENGTH = 300;
+const SCRATCH_OFFSET_AMPLITUDE = 100;
+
+const MAX_SCRATCHES = 100;
+const SCRATCH_WIDTH = 15;
+
+const scratches = [];
+function generateScratch(eye) {
+    if (Math.random() >= 0.5) {
+        return {cx: 2 * (Math.random() - 0.5) * SCRATCH_OFFSET_AMPLITUDE + eye.cx, 
+            cy: 2 * (Math.random() - 0.5) * SCRATCH_OFFSET_AMPLITUDE + eye.cy, 
+            length: ((SCRATCH_MAX_LENGTH - SCRATCH_MIN_LENGTH) * Math.random()) + SCRATCH_MIN_LENGTH, 
+            angle: 2 * (Math.random() - 0.5) * SCRATCH_ANGLE_AMPLITUDE + Math.PI/4};
+    } else {
+        return {cx: 2 * (Math.random() - 0.5) * SCRATCH_OFFSET_AMPLITUDE + eye.cx, 
+            cy: 2 * (Math.random() - 0.5) * SCRATCH_OFFSET_AMPLITUDE + eye.cy, 
+            length: ((SCRATCH_MAX_LENGTH - SCRATCH_MIN_LENGTH) * Math.random()) + SCRATCH_MIN_LENGTH, 
+            angle: 2 * (Math.random() - 0.5) * SCRATCH_ANGLE_AMPLITUDE - Math.PI/4};
+    }
+}
+
+function update_scratcheyes_effect() {
+    if (scratches.length < MAX_SCRATCHES) {
+        if (Math.random() >= 0.5) {
+            scratches.push(generateScratch(eye1));
+        } else {
+            scratches.push(generateScratch(eye2));
+        }
+    } else {
+        while (scratches.length >= MAX_SCRATCHES) { scratches.shift(); }
+    }
+}
+
+function draw_scratcheyes_effect() {
+    handsome_context.clearRect(0, 0, handsome_canvas.width, handsome_canvas.height);
+    handsome_context.lineWidth = SCRATCH_WIDTH;
+    handsome_context.strokeStyle = "black";
+    for (i = 0; i < scratches.length; i++) {
+        let start_x = scratches[i].cx - (scratches[i].length * Math.cos(scratches[i].angle));
+        let start_y = scratches[i].cy - (scratches[i].length * Math.sin(scratches[i].angle));
+        let end_x = scratches[i].cx + (scratches[i].length * Math.cos(scratches[i].angle));
+        let end_y = scratches[i].cy + (scratches[i].length * Math.sin(scratches[i].angle));
+
+        handsome_context.beginPath();
+        handsome_context.moveTo(start_x, start_y);
+        handsome_context.lineTo(end_x, end_y);
+        handsome_context.stroke();
+    }
+}
 
 
 

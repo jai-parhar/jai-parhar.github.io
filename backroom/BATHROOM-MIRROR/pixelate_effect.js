@@ -53,6 +53,12 @@ function pixelate_apply_colour_quantization(context, width, height, contrast, br
 class PixelateEffect {
 
     constructor() {
+
+        const crt_lines = document.createElement("div");
+        crt_lines.id = "crt-lines";
+        crt_lines.setAttribute("data-html2canvas-ignore", "true");
+        document.body.appendChild(crt_lines);
+        
         const mirror = document.getElementById("mirror");
         const mirror_canvas = document.getElementById("mirror-canvas");
 
